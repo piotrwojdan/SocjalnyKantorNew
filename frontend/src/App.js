@@ -14,7 +14,7 @@ function App() {
       }
     })
     .then(resp => resp.json())
-    .then(resp => console.log(resp))
+    .then(resp => setPosts(resp))
     .catch(err => console.log(err))
   }, [])
 
@@ -23,10 +23,10 @@ function App() {
       <h1>Posty</h1>
       {posts.map(p => {
         return (
-          <div key={p.id}>
-            <h3>p.tytul</h3>
-            <p>p.tresc</p>
-            <p>p.dataUtworzenia</p>
+          <div key = {p.id}>
+            <h3>{p.tytul}</h3>
+            <p>{p.tresc}</p>
+            <p>{p.dataUtworzenia}</p>
           </div>
         )
       }
