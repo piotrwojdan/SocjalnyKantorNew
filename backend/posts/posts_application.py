@@ -1,9 +1,10 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.ext.hybrid import hybrid_property
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS, cross_origin
 from datetime import datetime
-
+from enum import Enum
 
 
 
@@ -20,7 +21,10 @@ posts_db = SQLAlchemy(posts_app)
 posts_ma = Marshmallow(posts_app)
 
 
-
+class StatusPostu(Enum):
+    NOWY = 1
+    EDYTOWANY = 2
+    USUNIETY = 3
 
 
 # creating model for the orm to communicate with the db
@@ -29,7 +33,13 @@ class Post(posts_db.Model):
     tytul = posts_db.Column(posts_db.String(150), nullable=False)
     dataUtworzenia = posts_db.Column(posts_db.DateTime, nullable=False, default=datetime.utcnow())
     tresc = posts_db.Column(posts_db.Text, nullable=False)
-    # user_id = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("Klient.id"), nullable=False) # user.id z małej bo odwołujemy się do tablicy
+    status = posts_db.Column(posts_db.Integer, default=StatusPostu.NOWY)
+    client_id = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("klient.id"), nullable=True) # user.id z małej bo odwołujemy się do tablicy
+    admin_id = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("admin.id"), nullable=True) # user.id z małej bo odwołujemy się do tablicy
+    
+    @hybrid_property
+    def author_id(self):
+        return self.client_id or self.admin_id
 
     def __init__(self, tytul, tresc):
         self.tytul = tytul
@@ -38,16 +48,48 @@ class Post(posts_db.Model):
     def __repr__(self):
         return f"Post {self.tytul}, {self.dataUtworzenia}"
 
+class Klient(posts_db.Model):
+    id = posts_db.Column(posts_db.Integer, primary_key=True)
+    imie = posts_db.Column(posts_db.String(20), nullable=False)
+    nazwisko = posts_db.Column(posts_db.String(20), nullable=False)
+    posts = posts_db.relationship('Post', lazy=True)    #relacja
+
+
+    def __init__(self, imie, nazwisko):
+        self.imie = imie
+        self.nazwisko = nazwisko
+
+    def __repr__(self):
+        return f"Użytkownik {self.imie}, {self.login}"
+        
+
+class Admin(posts_db.Model): #
+
+    id = posts_db.Column(posts_db.Integer, primary_key=True)
+    imie = posts_db.Column(posts_db.String(20), nullable=False)
+    nawzisko = posts_db.Column(posts_db.String(20), nullable=False)
+    posts = posts_db.relationship('Post', lazy=True)    #relacja
+
+    def __init__(self, imie, nazwisko):
+        self.imie = imie
+        self.nazwisko = nazwisko
+
+    def __repr__(self):
+        return f"Użytkownik {self.imie}, {self.login}"
+
+
 
 
 
 # this is for jsonification of our post objects
 class postSchema(posts_ma.Schema):
     class Meta:
-        fields = ('id', 'tytul', 'dataUtworzenia', 'tresc')
+        fields = ('id', 'tytul', 'dataUtworzenia', 'tresc', 'author_id')
 
 post_schema = postSchema()
 posts_schema = postSchema(many=True)
+
+
 
 
 # and all the routes for our API to work
@@ -103,4 +145,6 @@ def deletePost(id):
 
 
 if __name__ == '__main__':
-    posts_app.run(debug=True, port=5001)
+    with posts_app.app_context():
+        posts_db.create_all()
+    # posts_app.run(debug=True, port=5001)
