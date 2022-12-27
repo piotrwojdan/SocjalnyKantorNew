@@ -22,9 +22,9 @@ posts_ma = Marshmallow(posts_app)
 
 
 class StatusPostu(Enum):
-    NOWY = 1
-    EDYTOWANY = 2
-    USUNIETY = 3
+    NOWY = "nowy"
+    EDYTOWANY = "edytowany"
+    USUNIETY = "usuniety"
 
 
 # creating model for the orm to communicate with the db
@@ -33,7 +33,7 @@ class Post(posts_db.Model):
     tytul = posts_db.Column(posts_db.String(150), nullable=False)
     dataUtworzenia = posts_db.Column(posts_db.DateTime, nullable=False, default=datetime.utcnow())
     tresc = posts_db.Column(posts_db.Text, nullable=False)
-    status = posts_db.Column(posts_db.Integer, default=StatusPostu.NOWY)
+    status = posts_db.Column(posts_db.String(10), default=StatusPostu.NOWY.value)
     client_id = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("klient.id"), nullable=True) # user.id z małej bo odwołujemy się do tablicy
     admin_id = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("admin.id"), nullable=True) # user.id z małej bo odwołujemy się do tablicy
     
@@ -47,6 +47,24 @@ class Post(posts_db.Model):
 
     def __repr__(self):
         return f"Post {self.tytul}, {self.dataUtworzenia}"
+
+
+class EdycjePostu(posts_db.Model):
+    id = posts_db.Column(posts_db.Integer, primary_key=True)
+    zawartosc = posts_db.Column(posts_db.Text, nullable=False)
+    dataEdycji = posts_db.Column(posts_db.DateTime, nullable=False, default=datetime.utcnow())
+    post = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("post.id"), nullable=False)
+    edytujacy = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("admin.id"), nullable=False)
+
+    def __init__(self, zawartosc, post_id, edytuajcy):
+        self.zawartosc = zawartosc
+        self.post = post_id
+        self.edytuajcy = edytuajcy
+
+
+    def __init__(self, zawartosc):
+        self.zawartosc = zawartosc
+    
 
 class Klient(posts_db.Model):
     id = posts_db.Column(posts_db.Integer, primary_key=True)
@@ -84,7 +102,7 @@ class Admin(posts_db.Model): #
 # this is for jsonification of our post objects
 class postSchema(posts_ma.Schema):
     class Meta:
-        fields = ('id', 'tytul', 'dataUtworzenia', 'tresc', 'author_id')
+        fields = ('id', 'tytul', 'status', 'dataUtworzenia', 'tresc', 'autor')
 
 post_schema = postSchema()
 posts_schema = postSchema(many=True)
@@ -122,12 +140,13 @@ def addPost():
 def editPost(id):
     post = Post.query.get(id)
 
-    tytul = request.json['tytul']
     tresc = request.json['tresc']
 
-    post.tytul = tytul
+    edycja = EdycjePostu(post.tresc, post.id, 0)  # tu potem zamiast 0 bedzie id zalogowanego uzytkownika
     post.tresc = tresc
+    post.status = StatusPostu.EDYTOWANY.value
 
+    posts_db.session.add(edycja)
     posts_db.session.commit()
 
     return post_schema.jsonify(post)
@@ -136,7 +155,8 @@ def editPost(id):
 def deletePost(id):
     post = Post.query.get(id)
  
-    posts_db.session.delete(post)
+    post.status = StatusPostu.USUNIETY.value
+
     posts_db.session.commit()
 
     return post_schema.jsonify(post)
@@ -145,6 +165,6 @@ def deletePost(id):
 
 
 if __name__ == '__main__':
-    with posts_app.app_context():
-        posts_db.create_all()
-    # posts_app.run(debug=True, port=5001)
+    # with posts_app.app_context():
+        # posts_db.create_all()
+    posts_app.run(debug=True, port=5001)
