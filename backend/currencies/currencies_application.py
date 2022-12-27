@@ -35,9 +35,9 @@ class Waluta(currencies_db.Model):
 
 class Transakcja(currencies_db.Model):
     id = currencies_db.Column(currencies_db.Integer, primary_key=True)
-    ilosc = currencies_db.Column(currencies_db.Double, nullable=False)
-    cenaJednostkowa = currencies_db.Column(currencies_db.Double, nullable=False)
-    cenaCalkowita = currencies_db.Column(currencies_db.Double, nullable=False)
+    ilosc = currencies_db.Column(currencies_db.Float, nullable=False)
+    cenaJednostkowa = currencies_db.Column(currencies_db.Float, nullable=False)
+    cenaCalkowita = currencies_db.Column(currencies_db.Float, nullable=False)
     numerKarty = currencies_db.Column(currencies_db.String(40), nullable=False)
     # dataUtworzenia = currencies_db.Column(currencies_db.DateTime, nullable=False)
     # dataZakonczenia = currencies_db.Column(currencies_db.DateTime, nullable=False)
