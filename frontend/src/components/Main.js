@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 
 import PostsList from './PostsList';
 import About from './About';
+import Post from './Post';
 // import Signup from './SignUp';
 
 const Main = (props) => {
@@ -10,6 +11,8 @@ const Main = (props) => {
     <Routes> 
       <Route exact path='/' element={ <PostsList posts = {props.posts}/>} ></Route>
       <Route exact path='/posts' element={ <PostsList posts = {props.posts}/>} ></Route>
+      <Route exact path='/post/:id' element={ <Post posts = {props.posts}/>} ></Route>
+      <Route exact path='/editpost/:id' element={ <Post posts = {props.posts}/>} ></Route>
       {/* <Route exact path='/exchange' component={Exchange}></Route> */}
       {/* <Route exact path='/plots' component={Plots}></Route> */}
       <Route exact path='/about' component={About}></Route>

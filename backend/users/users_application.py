@@ -4,13 +4,18 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from abc import ABCMeta
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 
 users_app = Flask(__name__)
 
 users_app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 users_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+
 users_db = SQLAlchemy(users_app)
 users_ma = Marshmallow(users_app)
+
+users_app.config['JWT_SECRET_KEY'] = '78f8fd67gf7gd8fg68df7g6800gs7ff897s9d'
+users_jwt = JWTManager(users_app)
 
 
 # class User(metaclass=ABCMeta):
@@ -21,14 +26,15 @@ users_ma = Marshmallow(users_app)
 #     dataUrodzenia = datetime.utcnow
 
 
-class Klient(users_db.Model):
+class User(users_db.Model):
     __tablename__ = "Klient"
     id = users_db.Column(users_db.Integer, primary_key=True)
     imie = users_db.Column(users_db.String(20), nullable=False)
     nazwisko = users_db.Column(users_db.String(20), nullable=False)
     login = users_db.Column(users_db.String(100), unique=True, nullable=False) #login to email
     haslo = users_db.Column(users_db.String(60), nullable=False)
-    dataUrodzenia = users_db.Column(users_db.Date, nullable=True)
+    dataUrodzenia = users_db.Column(users_db.Date, nullable=False)
+    czyAdmin = users_db.Column(users_db.Boolean, nullable=False, default=False)
     # posts = users_db.relationship('Post', backref='author', lazy=True)    #relacja
     #rachunki = db.relationship('Rachunek', backref='author', lazy=True)
 
@@ -45,23 +51,23 @@ class Klient(users_db.Model):
         return f"Użytkownik {self.imie}, {self.login}"
         
 
-class Administrator(users_db.Model): #
+# class Administrator(users_db.Model): #
 
-    id = users_db.Column(users_db.Integer, primary_key=True)
-    imie = users_db.Column(users_db.String(20), nullable=False)
-    nawzisko = users_db.Column(users_db.String(20), nullable=False)
-    login = users_db.Column(users_db.String(100), unique=True, nullable=False) #login to email
-    haslo = users_db.Column(users_db.String(60), nullable=False)
-    dataUrodzenia = users_db.Column(users_db.Date, nullable=True)
-    # posts = db.relationship('Post', backref='author', lazy=True)    #relacja
+#     id = users_db.Column(users_db.Integer, primary_key=True)
+#     imie = users_db.Column(users_db.String(20), nullable=False)
+#     nawzisko = users_db.Column(users_db.String(20), nullable=False)
+#     login = users_db.Column(users_db.String(100), unique=True, nullable=False) #login to email
+#     haslo = users_db.Column(users_db.String(60), nullable=False)
+#     dataUrodzenia = users_db.Column(users_db.Date, nullable=True)
+#     # posts = db.relationship('Post', backref='author', lazy=True)    #relacja
 
-    def __init__(self, imie, login, haslo):
-        self.imie = imie
-        self.login = login
-        self.haslo = generate_password_hash(haslo, method="sha256")
+#     def __init__(self, imie, login, haslo):
+#         self.imie = imie
+#         self.login = login
+#         self.haslo = generate_password_hash(haslo, method="sha256")
 
-    def __repr__(self):
-        return f"Użytkownik {self.imie}, {self.login}"
+#     def __repr__(self):
+#         return f"Użytkownik {self.imie}, {self.login}"
 
 
 
