@@ -73,7 +73,8 @@ class Klient(posts_db.Model):
     posts = posts_db.relationship('Post', lazy=True)    #relacja
 
 
-    def __init__(self, imie, nazwisko):
+    def __init__(self, id, imie, nazwisko):
+        self.id = id
         self.imie = imie
         self.nazwisko = nazwisko
 
@@ -106,6 +107,14 @@ class postSchema(posts_ma.Schema):
 
 post_schema = postSchema()
 posts_schema = postSchema(many=True)
+
+
+class userSchema(posts_ma.Schema):
+    class Meta:
+        fields = ('id', 'imie', 'nazwisko')
+
+user_schema = userSchema()
+users_schema = userSchema(many=True)
 
 
 
@@ -144,7 +153,7 @@ def editPost(id):
 
     edycja = EdycjePostu(post.tresc, post.id, 0)  # tu potem zamiast 0 bedzie id zalogowanego uzytkownika
     post.tresc = tresc
-    post.status = StatusPostu.EDYTOWANY.value
+    post.status = StatusPostu.EDYTOWANY
 
     posts_db.session.add(edycja)
     posts_db.session.commit()
@@ -160,6 +169,22 @@ def deletePost(id):
     posts_db.session.commit()
 
     return post_schema.jsonify(post)
+
+
+@posts_app.route('/user/add', methods=['POST'])
+def addUser():
+    id = request.json['id']
+    imie = request.json['imie']
+    nazwisko = request.json['nazwisko']
+
+    user = Klient(id, imie, nazwisko)
+
+    posts_db.session.add(user)
+    posts_db.session.commit()
+
+    return user_schema.jsonify(user)
+
+
 
 
 

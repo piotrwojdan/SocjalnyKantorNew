@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 
@@ -9,16 +9,31 @@ currencies_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///currencies.db'
 currencies_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 currencies_db = SQLAlchemy(currencies_app)
-marshmallow = Marshmallow(currencies_app)
+currencies_ma = Marshmallow(currencies_app)
 
 
-class CurrencySchema(marshmallow.Schema):
+
+
+
+
+class CurrencySchema(currencies_ma.Schema):
     class Meta:
         fields = ('id', 'symbol', 'nazwa')
 
 
 currency_schema = CurrencySchema()
 currencies_schema = CurrencySchema(many=True)
+
+class userSchema(currencies_ma.Schema):
+    class Meta:
+        fields = ('id', 'imie', 'nazwisko')
+
+user_schema = userSchema()
+users_schema = userSchema(many=True)
+
+
+
+
 
 
 class Waluta(currencies_db.Model):
@@ -79,6 +94,19 @@ def get_currencies():
     results = currency_schema.dump(all_currencies)
     return jsonify(results)
 
+@currencies_app.route('/user/add', methods=['POST'])
+def addUser():
+    id = request.json['id']
+    imie = request.json['imie']
+    nazwisko = request.json['nazwisko']
+
+    user = Klient(id, imie, nazwisko)
+
+    currencies_db.session.add(user)
+    currencies_db.session.commit()
+
+    return user_schema.jsonify(user)
+
 
 if __name__ == '__main__':
-    currencies_app.run(debug=True)
+    currencies_app.run(debug=True, port=5003)
