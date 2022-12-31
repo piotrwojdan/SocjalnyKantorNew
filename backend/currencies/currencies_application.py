@@ -91,8 +91,20 @@ class Klient(currencies_db.Model):
 @currencies_app.route('/get', methods=['GET'])
 def get_currencies():
     all_currencies = Waluta.query.all()
-    results = currency_schema.dump(all_currencies)
+    results = currencies_schema.dump(all_currencies)
     return jsonify(results)
+
+@currencies_app.route('/add', methods=['POST'])
+def addPost():
+    symbol = request.json['symbol']
+    nazwa = request.json['nazwa']
+
+    waluta = Waluta(symbol, nazwa)
+
+    currencies_db.session.add(waluta)
+    currencies_db.session.commit()
+
+    return currency_schema.jsonify(waluta)
 
 @currencies_app.route('/user/add', methods=['POST'])
 def addUser():
@@ -109,4 +121,6 @@ def addUser():
 
 
 if __name__ == '__main__':
+    # with currencies_app.app_context():
+    #     currencies_db.create_all()
     currencies_app.run(debug=True, port=5003)

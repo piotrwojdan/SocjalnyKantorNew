@@ -3,6 +3,20 @@ import { Link } from 'react-router-dom'
 
 function PostsList(props) {
 
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:5001/get', {
+      'method':'GET',
+      headers: {
+        'Content-Type':'application/json'
+      }
+    })
+    .then(resp => resp.json())
+    .then(resp => setPosts(resp))
+    .catch(err => console.log(err))
+  }, [])
+
   return (
     <>
         {props.posts && props.posts.map(p => {
