@@ -12,10 +12,6 @@ currencies_db = SQLAlchemy(currencies_app)
 currencies_ma = Marshmallow(currencies_app)
 
 
-
-
-
-
 class CurrencySchema(currencies_ma.Schema):
     class Meta:
         fields = ('id', 'symbol', 'nazwa')
@@ -30,11 +26,6 @@ class userSchema(currencies_ma.Schema):
 
 user_schema = userSchema()
 users_schema = userSchema(many=True)
-
-
-
-
-
 
 class Waluta(currencies_db.Model):
     id = currencies_db.Column(currencies_db.Integer, primary_key=True)
