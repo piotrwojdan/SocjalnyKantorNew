@@ -1,6 +1,6 @@
-from .posts.posts_application import posts_app, posts_db
-from .currencies.currencies_application import currencies_app, currencies_db
-from .users.users_application import users_app, users_db
+from posts.posts_application import posts_app, posts_db
+from currencies.currencies_application import currencies_app, currencies_db
+from users.users_application import users_app, users_db
 
 
 if __name__ == "__main__":
