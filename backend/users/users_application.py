@@ -1,7 +1,8 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from flask_cors import CORS, cross_origin
 from abc import ABCMeta
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
@@ -9,6 +10,7 @@ from flask_login import current_user
 import requests, json
 
 users_app = Flask(__name__)
+CORS(users_app)
 
 users_app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 users_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
@@ -89,6 +91,18 @@ def register():
     requests.post(CURRENCIES_URL + "user/add", json=to_send)
 
     return user_schema.jsonify(user)
+
+@users_app.route("/token", methods=['POST'])
+def create_token():
+    login = request.json.get('login', None)
+    haslo = request.json.get('haslo', None)
+
+    # Sprawdzanie poprawnosci tutaj powinno byc
+    if login != 'test' or haslo != 'test':
+        return jsonify({'msg': 'Zle dane'}), 401
+
+    access_token = create_access_token(identity=login)
+    return jsonify(access_token=access_token)
 
 
 @users_app.route("/login", methods=['GET', 'POST'])

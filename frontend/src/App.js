@@ -1,8 +1,14 @@
 import './App.css';
+import { Routes, Route } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Main from './components/Main';
 import React from 'react';
+// import DodajPost from "./pages/DodajPost"
+// import Posty from "./pages/Posty"
+import Layout from "./components/layout/Layout"
+import About from "./components/About"
+import Login from "./components/Login";
 
 
 function App() {
@@ -22,10 +28,18 @@ function App() {
   }, [])
 
   return (
-    <div className='App'>
-      <Navbar />
-      <Main posts={posts} />
-    </div>
+    // <div className='App'>
+    //   <Navbar />
+    //   <Main posts={posts} />
+    // </div>
+      <Layout>
+        <Routes>
+          {/*<Route path="/" element={<Posty />} />*/}
+          {/*<Route path="/dodajpost" element={<DodajPost />} />*/}
+          <Route path="/about" element={<About />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </Layout>
   );
 }
 
