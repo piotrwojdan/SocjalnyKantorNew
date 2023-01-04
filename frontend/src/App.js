@@ -34,8 +34,8 @@ function App() {
     // </div>
       <Layout>
         <Routes>
-          {/*<Route path="/" element={<Posty />} />*/}
-          {/*<Route path="/dodajpost" element={<DodajPost />} />*/}
+          <Route path="/" element={<Posty />} />
+          <Route path="/dodajpost" element={<DodajPost />} />
           <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />
         </Routes>
