@@ -56,10 +56,10 @@ class EdycjePostu(posts_db.Model):
     post = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("post.id"), nullable=False)
     edytujacy = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("admin.id"), nullable=False)
 
-    def __init__(self, zawartosc, post_id, edytuajcy):
+    def __init__(self, zawartosc, post_id, edytujacy):
         self.zawartosc = zawartosc
         self.post = post_id
-        self.edytuajcy = edytuajcy
+        self.edytujacy = edytujacy
 
 
     def __init__(self, zawartosc):
@@ -95,8 +95,6 @@ class Admin(posts_db.Model): #
 
     def __repr__(self):
         return f"Użytkownik {self.imie}, {self.login}"
-
-
 
 
 
