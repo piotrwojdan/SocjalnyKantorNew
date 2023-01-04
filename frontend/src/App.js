@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Main from './components/Main';
 import React from 'react';
-// import DodajPost from "./pages/DodajPost"
-// import Posty from "./pages/Posty"
+import DodajPost from "./pages/DodajPost"
+import Posty from "./pages/Posty"
 import Layout from "./components/layout/Layout"
 import About from "./components/About"
 import Login from "./components/Login";
