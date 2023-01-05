@@ -1,4 +1,5 @@
 import PostyList from "../components/posty/PostyList"
+import React from "react";
 
 const DUMMY_DATA = [
   {

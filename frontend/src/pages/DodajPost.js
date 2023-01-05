@@ -1,6 +1,7 @@
-import NewMeetupForm from "../components/meetups/NewMeetupForm"
+// import NewMeetupForm from "../components/meetups/NewMeetupForm"
 import { useNavigate } from 'react-router-dom';
 import DodajPostForm from "../components/posty/DodajPostForm"
+import React from "react";
 
 function DodajPost(){
 

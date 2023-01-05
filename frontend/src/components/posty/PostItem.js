@@ -1,5 +1,6 @@
 import classes from './MeetupItem.module.css';
 import Card from '../ui/Card'
+import React from 'react';
 
 function PostItem(props){
   return <li className={classes.item}>

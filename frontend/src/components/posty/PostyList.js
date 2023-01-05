@@ -1,5 +1,6 @@
 import classes from './MeetupList.module.css'
 import PostItem from "./PostItem"
+import React from 'react';
 
 function PostyList(props){
   return <ul className={classes.list}>
