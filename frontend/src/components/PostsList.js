@@ -19,7 +19,7 @@ function PostsList(props) {
 
   return (
     <>
-        {props.posts && props.posts.map(p => {
+        {posts && posts.map(p => {
           const address = '/post/' + p.id; 
         return (
           <li key={p.id}>
