@@ -26,8 +26,10 @@
 }
 
 .actions {
-  padding: 1.5rem;
+  padding: 20px;
   text-align: center;
+  justify-content: space-between;
+  display: flex;
 }
 
 .actions button {
@@ -37,7 +39,7 @@
   border: 1px solid #3e7da9;
   background-color: transparent;
   padding: 0.5rem 1.5rem;
-  border-radius: 4px;
+  border-radius: 15px;
 }
 
 .actions button:hover,
