@@ -1,7 +1,7 @@
 import classes from "./MeetupItem.module.css"
 import Card from "../ui/Card"
 import { useParams } from "react-router-dom"
-import { useEffect, useState } from "@types/react"
+import { useEffect, useState } from "react"
 //wyświetlamy pojedyńczy post
 import React from 'react';
 
