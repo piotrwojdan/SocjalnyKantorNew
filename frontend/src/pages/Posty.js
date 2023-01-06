@@ -1,5 +1,5 @@
 import PostyList from "../components/posty/PostyList"
-import posts_application from "../../../backend/posts"
+//import posts_application from "../../../backend/posts"
 
 // const DUMMY_DATA = [
 //   {
