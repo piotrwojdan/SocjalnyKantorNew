@@ -3,6 +3,8 @@ import Card from "../ui/Card"
 import { useParams } from "react-router-dom"
 import { useEffect, useState } from "@types/react"
 //wyświetlamy pojedyńczy post
+import React from 'react';
+
 
 function PostItem(props) {
   const { id } = useParams()
