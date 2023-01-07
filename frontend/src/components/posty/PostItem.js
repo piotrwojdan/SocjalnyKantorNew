@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom'
 import { useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
 //wyświetlamy pojedyńczy post
+import React from 'react';
+
 
 function PostItem(props) {
   const editPost = (post) => {

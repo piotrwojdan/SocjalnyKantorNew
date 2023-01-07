@@ -1,6 +1,7 @@
 import Card from "../ui/Card";
 import classes from './NowyPost.module.css'
 import {useRef} from "react"
+import React from "react";
 
 function DodajPostForm(props) {
   //nie uzywamy states tyle ref bo interesuje nas stan tylko po przycisnieciu submit
