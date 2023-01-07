@@ -86,7 +86,7 @@ def get_currencies():
     return jsonify(results)
 
 @currencies_app.route('/add', methods=['POST'])
-def addPost():
+def addCurrency():
     symbol = request.json['symbol']
     nazwa = request.json['nazwa']
 
