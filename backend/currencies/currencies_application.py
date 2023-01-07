@@ -116,27 +116,26 @@ def add_currency():
 
 @currencies_app.route('/transaction/add', methods=['POST'])
 def add_transaction():
-    ilosc = request.json['symbol']
-    cenaJednostkowa = request.json['symbol']
-    cenaCalkowita = request.json['symbol']
-    numerKarty = request.json['symbol']
+    ilosc = request.json['ilosc']
+    cenaJednostkowa = request.json['cenaJedn']
+    numerKarty = request.json['nrKarty']
     # dataUtworzenia = currencies_db.Column(currencies_db.DateTime, nullable=False)
     # dataZakonczenia = currencies_db.Column(currencies_db.DateTime, nullable=False)
-    walutaId = request.json['symbol']
-    klientId = request.json['symbol']
-    rachunekId = request.json['symbol']
+    walutaId = request.json['waluta']
+    klientId = request.json['klient']
+    rachunekId = request.json['idRachunku']
 
-    waluta = Waluta(symbol, nazwa)
+    transakcja = Transakcja(ilosc, walutaId, cenaJednostkowa, klientId, )
 
-    currencies_db.session.add(waluta)
+    currencies_db.session.add(transakcja)
     currencies_db.session.commit()
 
-    return currency_schema.jsonify(waluta)
+    return transaction_schema.jsonify(transakcja)
 
 @currencies_app.route('/transaction/get', methods=['GET'])
 def get_currencies():
     all_currencies = Waluta.query.all()
-    results = currencies_schema.dump(all_currencies)
+    results = transactions_schema.dump(all_currencies)
     return jsonify(results)
 
 @currencies_app.route('/rachunek/add', methods=['POST'])

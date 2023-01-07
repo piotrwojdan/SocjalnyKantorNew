@@ -1,5 +1,6 @@
 import classes from './MeetupList.module.css'
 import PostItem from "./PostItem"
+import React from "react"
 //mapujemy listę postów z props
 
 function PostyList(props){

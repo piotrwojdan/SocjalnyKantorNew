@@ -6,6 +6,7 @@ import DodajPost from "./pages/DodajPost"
 import Posty from "./pages/Posty"
 import Layout from "./components/layout/Layout"
 import About from "./components/About"
+import WymianaWalut from "./pages/WymianaWalut"
 
 function App() {
   const [posts, setPosts] = useState([])
@@ -36,6 +37,7 @@ function App() {
         <Route path="/" element={<Posty />} />
         <Route path="/dodajpost" element={<DodajPost />} />
         <Route path="/about" element={<About />} />
+        <Route path="/exchange" element={<WymianaWalut />} />
       </Routes>
     </Layout>
   )
