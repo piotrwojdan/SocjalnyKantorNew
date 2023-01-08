@@ -182,7 +182,7 @@ function KupWaluteForm(props) {
                     <div className={classes.control}>
                         <label htmlFor={'cena'}>Cena</label>
                     </div>
-                    <label id="cena">{ilosc * kurs}</label>
+                    <label id="cena">{ilosc * price}</label>
                     <div className={classes.actions}>
                         <button>Kup</button>
                     </div>
