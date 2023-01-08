@@ -133,7 +133,7 @@ def add_transaction():
     return transaction_schema.jsonify(transakcja)
 
 @currencies_app.route('/transaction/get', methods=['GET'])
-def get_currencies():
+def get_transactions():
     all_currencies = Waluta.query.all()
     results = transactions_schema.dump(all_currencies)
     return jsonify(results)

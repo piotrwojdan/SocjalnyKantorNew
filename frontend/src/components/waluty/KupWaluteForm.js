@@ -2,16 +2,19 @@ import Card from "../ui/Card";
 import classes from './KupWaluteForm.module.css'
 import { useRef, useEffect, useState } from "react"
 import React from "react";
+import Binance from "binance-api-react-native"
 
 function KupWaluteForm(props) {
+    const client = Binance()
 
     const [currencies, setCurrencies] = useState([]);
     const [currency, setCurrency] = useState("");
-    const [ilosc, setIlosc] = useState(1)
-    const [kurs, setKurs] = useState(0)
+    const [ilosc, setIlosc] = useState(1);
+    const [kurs, setKurs] = useState(0);
+    let prices;
 
     useEffect(() => {
-        fetch('http://127.0.0.1:5003/get', {
+        fetch('http://127.0.0.1:5003/currency/get', {
             'method': 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -20,15 +23,14 @@ function KupWaluteForm(props) {
             .then(resp => resp.json())
             .then(resp => setCurrencies(resp))
             .catch(err => console.log(err))
-        setCurrency('BTC')
-    }, [])
+        setCurrency('BTCUSDT')
+    }, []);
 
     useEffect(() => {
-        fetch("https://api.binance.com/api/v3/ticker/price?symbol="+currency.symbol+"USDT")
-            .then(resp => resp.json())
-            .then(resp => setKurs(resp['price']))
-            .catch(err => console.log(err))
-    }, [])
+        client.prices()
+            .then(resp => prices = resp)
+            .then(console.log(prices))
+    }, []);
 
 
     //nie uzywamy states tyle ref bo interesuje nas stan tylko po przycisnieciu submit
@@ -73,7 +75,7 @@ function KupWaluteForm(props) {
                         defaultValue={ilosc}
                         onChange={(event) => {
                             setIlosc(event.target.value)
-                            return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))
+                            return (event.charCode != 8 && event.charCode == 0 || (event.charCode >= 48 && event.charCode <= 57))
                         }}
                         ref={iloscInputRef} />
                 </div>
