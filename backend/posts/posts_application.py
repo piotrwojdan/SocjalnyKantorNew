@@ -5,7 +5,7 @@ from flask_marshmallow import Marshmallow
 from flask_cors import CORS, cross_origin
 from datetime import datetime
 from enum import Enum
-
+from sqlalchemy import update
 
 
 # configuring the flask app and database
@@ -147,12 +147,15 @@ def addPost():
 def editPost(id):
     post = Post.query.get(id)
 
-    tresc = request.json['tresc']
+    updatedTresc = request.json['tresc']
+    updatedTytul = request.json['tytul']
 
     edycja = EdycjePostu(post.tresc, post.id, 0)  # tu potem zamiast 0 bedzie id zalogowanego uzytkownika
-    post.tresc = tresc
+    post.tresc = updatedTresc
+    post.tytul = request.json['tytul']
     post.status = StatusPostu.EDYTOWANY
 
+    updatedPost = update(Post).values(tytul=updatedTytul, tresc=updatedTresc).where(Post.columns.id == id)
     posts_db.session.add(edycja)
     posts_db.session.commit()
 

@@ -5,6 +5,7 @@ import DodajPost from "./pages/DodajPost"
 import Layout from "./components/layout/Layout"
 import About from "./components/About"
 import Posty from "./pages/Posty"
+import EdytujPostForm from "./components/posty/EdytujPostForm"
 
 function App() {
   const [posts, setPosts] = useState([])
@@ -22,7 +23,6 @@ function App() {
       .catch((err) => console.log(err))
   }, [])
 
-
   return (
     //tutaj musicie dodać swoje ścieżki//////////////////////////////////////////////////
 
@@ -31,6 +31,7 @@ function App() {
         <Route path="/" element={<Posty posts={posts} />} />
         <Route path="/dodajpost" element={<DodajPost />} />
         <Route path="/about" element={<About />} />
+        <Route path="/edytujpost/:id" element={<EdytujPostForm />} />
       </Routes>
     </Layout>
   )

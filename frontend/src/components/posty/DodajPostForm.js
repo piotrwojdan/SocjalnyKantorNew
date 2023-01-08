@@ -15,12 +15,10 @@ function DodajPostForm(props) {
     //czytamy podane przez użytkownika wartości
 
     const enteredTytul = tytulInputRef.current.value //obecna wartość
-    const enteredDate = new Date()
     const enteredTresc = TrescInputRef.current.value
 
     const meetupData = {
       tytul: enteredTytul,
-      data: enteredDate,
       tresc: enteredTresc
     }
     console.log(meetupData)

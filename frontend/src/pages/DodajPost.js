@@ -5,6 +5,17 @@ function DodajPost() {
   const navigate = useNavigate()
   function addMeetupHandler(meetupData) {
     //fetch i zapis do bazy
+    fetch("http://127.0.0.1:5001/add", {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({tytul: meetupData.tytul, tresc: meetupData.tresc})
+    }).then(res => res.json())
+      .then(res => console.log(res));
+
+
     navigate("/")
   }
 
