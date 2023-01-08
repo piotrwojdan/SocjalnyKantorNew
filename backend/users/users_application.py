@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -89,6 +89,19 @@ def register():
     requests.post(CURRENCIES_URL + "user/add", json=to_send)
 
     return user_schema.jsonify(user)
+
+
+@users_app.route("/token", methods=['POST'])
+def create_token():
+    login = request.json.get('login', None)
+    haslo = request.json.get('haslo', None)
+
+    # Sprawdzanie poprawnosci tutaj powinno byc
+    if login != 'test' or haslo != 'test':
+        return jsonify({'msg': 'Zle dane'}), 401
+
+    access_token = create_access_token(identity=login)
+    return jsonify(access_token=access_token)
 
 
 @users_app.route("/login", methods=['GET', 'POST'])
