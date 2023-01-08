@@ -3,7 +3,9 @@
 }
 
 .control {
+  padding: 1.5rem;
   margin-bottom: 0.5rem;
+  font-size: large;
 }
 
 .control label {
@@ -22,24 +24,66 @@
   width: 100%;
 }
 
+/*.actions {*/
+/*  margin-top: 1rem;*/
+/*  text-align: right;*/
+/*}*/
+
+/*.actions button {*/
+/*  font: inherit;*/
+/*  cursor: pointer;*/
+/*  color: #59a8de;*/
+/*  border: 1px solid #3e7da9;*/
+/*  background-color: transparent;*/
+/*  padding: 0.5rem 1.5rem;*/
+/*  border-radius: 15px;*/
+/*}*/
+
+/*.actions button:hover,*/
+/*.actions button:active {*/
+/*  background-color: #ffe2ed;*/
+/*}*/
+
+.item {
+  margin: 1rem 0;
+}
+
+.content {
+  text-align: center;
+  padding: 0.3rem;
+}
+
+.content h3 {
+  font-size: 1.9rem;
+  color: #2c292b;
+}
+
+h4 {
+  font-size: 1rem;
+  color: #2c292b;
+}
+
+p {
+  font-size: 1.5rem;
+}
 .actions {
-  margin-top: 1rem;
-  text-align: right;
+  padding: 20px;
+  text-align: center;
+  justify-content: space-between;
+  display: flex;
 }
 
 .actions button {
   font: inherit;
   cursor: pointer;
-  background-color: #77002e;
-  color: white;
+  color: #59a8de;
+  border: 1px solid #3e7da9;
+  background-color: transparent;
   padding: 0.5rem 1.5rem;
-  border: 1px solid #77002e;
-  border-radius: 4px;
-  font-weight: bold;
+  border-radius: 15px;
 }
 
 .actions button:hover,
 .actions button:active {
-  background-color: #a50e48;
-  border-color: #a50e48;
+  background-color: #ffe2ed;
 }

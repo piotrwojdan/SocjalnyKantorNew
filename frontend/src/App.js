@@ -1,13 +1,14 @@
-//import "./App.css"
 import { Routes, Route } from "react-router-dom"
 import React, { useEffect, useState } from "react"
 //importujemy komponenty czyli strony które będziemy wyświetlać
 import DodajPost from "./pages/DodajPost"
-import Posty from "./pages/Posty"
 import Layout from "./components/layout/Layout"
 import About from "./components/About"
+import Posty from "./pages/Posty"
+import EdytujPostForm from "./components/posty/EdytujPostForm"
 import WymianaWalut from "./pages/WymianaWalut"
 import Summary from "./components/waluty/Summary"
+
 
 function App() {
   const [posts, setPosts] = useState([])
@@ -30,9 +31,10 @@ function App() {
 
     <Layout>
       <Routes>
-        <Route path="/" element={<Posty />} />
+        <Route path="/" element={<Posty posts={posts} />} />
         <Route path="/dodajpost" element={<DodajPost />} />
         <Route path="/about" element={<About />} />
+        <Route path="/edytujpost/:id" element={<EdytujPostForm />} />
         <Route path="/exchange" element={<WymianaWalut />} />
         <Route path="/exchange/summary" element={<Summary />} />
       </Routes>
