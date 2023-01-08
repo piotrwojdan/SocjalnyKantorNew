@@ -6,11 +6,10 @@ function WymianaWalut() {
     const navigate = useNavigate();
     function addTransaction(meetupData) {
         //fetch i zapis do bazy
-        navigate('/home');
+        navigate('/exchange/summary');
     }
 
     return (<section>
-        <h1>Wymiana walut</h1>
         <KupWaluteForm onSubmitForm={addTransaction} />
     </section>)
 }

@@ -114,3 +114,15 @@ h2 {
   font-size: 1.5rem;
   color: #2c292b;
 }
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 80vh;
+}
+
+.chart-container {
+  width: 80%;
+  height: 100%;
+}

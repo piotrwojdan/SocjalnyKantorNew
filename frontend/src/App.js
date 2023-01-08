@@ -7,6 +7,7 @@ import Posty from "./pages/Posty"
 import Layout from "./components/layout/Layout"
 import About from "./components/About"
 import WymianaWalut from "./pages/WymianaWalut"
+import Summary from "./components/waluty/Summary"
 
 function App() {
   const [posts, setPosts] = useState([])
@@ -25,11 +26,6 @@ function App() {
   }, [])
 
   return (
-    // <div className="App">
-    //   <Navbar />
-    //   <Main posts={posts} />
-    // </div>
-
     //tutaj musicie dodać swoje ścieżki//////////////////////////////////////////////////
 
     <Layout>
@@ -38,6 +34,7 @@ function App() {
         <Route path="/dodajpost" element={<DodajPost />} />
         <Route path="/about" element={<About />} />
         <Route path="/exchange" element={<WymianaWalut />} />
+        <Route path="/exchange/summary" element={<Summary />} />
       </Routes>
     </Layout>
   )
