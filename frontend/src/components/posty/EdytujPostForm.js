@@ -2,7 +2,6 @@ import React from "react"
 import Card from "../ui/Card"
 import classes from "./NowyPost.module.css"
 import {useState, useEffect } from "react"
-import APIService from "./APIService"
 import { useNavigate, useParams } from "react-router-dom"
 
 function EdytujPostForm(props) {
@@ -37,10 +36,7 @@ function EdytujPostForm(props) {
   },[post])
 
   const updatePost = () => {
-    // APIService.UpdatePost(props.post.id, {tytul, tresc})
-    //   .then(resp => props.updatedData(resp))
-    //   .catch(error => console.log(error))
-    console.log(post)
+    // console.log(post)
 
     fetch(`http://127.0.0.1:5001/update/${id}`, {
       method: 'PUT',
@@ -48,16 +44,16 @@ function EdytujPostForm(props) {
         'Accept': 'application/json, text/plain, */*',
         'Content-Type': 'application/json'
       },
-      //body: JSON.stringify({tytul: tytul, tresc: tresc})
       body: JSON.stringify({tytul: tytul, tresc: tresc})
     }).then(res => res.json())
-      .then(res => console.log(res));
+      .then(res => console.log(res))
+      .then(() => {window.location.reload(false)})
 
-    navigate("/") //czy potrzebne
+    navigate("/")
   }
 
   const goHome = () => {
-    navigate("/") //czy potrzebne
+    navigate("/")
   }
 
   return (
