@@ -4,7 +4,7 @@ import { Chart, CategoryScale, LinearScale, PointElement, LineElement} from "cha
 
 Chart.register(CategoryScale, LinearScale, PointElement, LineElement);
 
-function Plot({ price, data }) {
+function Plot({ price, data, days }) {
   const opts = {
     tooltips: {
       intersect: false,
@@ -13,6 +13,10 @@ function Plot({ price, data }) {
     responsive: true,
     maintainAspectRatio: false
   };
+//  console.log(data)
+  // let someDays = data.datasets[0].data.slice(-days);
+  // data.datasets[0].data = someDays;
+
   if (price === "0.00") {
     return <h2>please select a currency pair</h2>;
   }
