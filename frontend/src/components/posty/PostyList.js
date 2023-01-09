@@ -5,6 +5,7 @@ import Card from "../ui/Card"
 import React from "react"
 import Moment from 'moment';
 import { useState } from "react"
+import PostItem from "./PostItem"
 
 //mapujemy listę postów z props
 function PostyList(props) {
