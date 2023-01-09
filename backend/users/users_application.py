@@ -6,9 +6,11 @@ from abc import ABCMeta
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from flask_login import current_user
+from flask_cors import CORS
 import requests, json
 
 users_app = Flask(__name__)
+CORS(users_app)
 
 users_app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 users_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
