@@ -56,16 +56,13 @@ function KupWaluteForm(props) {
             first.current = true;
         };
 
-        //call async function
         apiCall()
     }, [])
 
     useEffect(() => {
-        //prevents this hook from running on initial render
         if (!first.current) {
             return;
         }
-
 
         let msg = {
             type: "subscribe",
@@ -87,7 +84,7 @@ function KupWaluteForm(props) {
             let formattedData = formatData(dataArr);
             setpastData(formattedData);
         };
-        //run async function to get historical data
+
         fetchHistoricalData();
         //need to update event listener for the websocket object so that it is listening for the newly updated currency pair
         ws.current.onmessage = (e) => {
@@ -102,7 +99,8 @@ function KupWaluteForm(props) {
         };
         //dependency array is passed pair state, will run on any pair state change
 
-    }, [pair]);
+    }, [pair, dni]);
+
 
     // useEffect(() => {
     //     fetch('http://127.0.0.1:5003/currency/get', {
@@ -122,22 +120,23 @@ function KupWaluteForm(props) {
 
     const walutaInputRef = useRef(); // w tym inpucie tworzymy połączenie z tym
     const iloscInputRef = useRef();
-    const kursInputRef = useRef();
-    const cenaInputRef = useRef();
+
 
     //react automatycznie przekaż event do tej funkcji jeśli wpiszemy ją w onSubmit
     function submitHandler(event) {
-        event.preventDefault() //zapobiegamy wysyłaniu żadania przez przeglądarkę
+        event.preventDefault(); //zapobiegamy wysyłaniu żadania przez przeglądarkę
         //czytamy podane przez użytkownika wartości
 
-        const enteredWaluta = walutaInputRef.current.value //obecna wartość
-        // const enteredDate = new Date()
-        const enteredilosc = iloscInputRef.current.value
+        const enteredWaluta = walutaInputRef.current.value; //obecna wartość
+        const enteredilosc = iloscInputRef.current.value;
+        const enteredKurs = price;
+        const enteredCena = price * parseFloat(enteredilosc);
 
         const transactionData = {
             waluta: enteredWaluta,
-            // data: enteredDate,
-            ilosc: enteredilosc
+            ilosc: enteredilosc,
+            cena: enteredCena,
+            kurs: enteredKurs
         }
         console.log(transactionData)
 
@@ -182,17 +181,17 @@ function KupWaluteForm(props) {
                             <div className="col-sm">
                                 <div className={classes.control}>
                                     <div className="ms-2">
-                                    <label htmlFor={'waluta'}>Waluta</label>
-                                    <select type="text" required id="waluta" ref={walutaInputRef} onChange={handleSelect}>
-                                        {currencies.map((cur) => { return <option key={cur.id} value={cur.id}>{cur.id}</option> })}
-                                    </select>
+                                        <label htmlFor={'waluta'}>Waluta</label>
+                                        <select className="form-select" type="text" required id="waluta" ref={walutaInputRef} onChange={handleSelect}>
+                                            {currencies.map((cur) => { return <option key={cur.id} value={cur.id}>{cur.id}</option> })}
+                                        </select>
                                     </div>
                                 </div>
                             </div>
                             <div className="col-sm">
                                 <div className={classes.control}>
                                     <label htmlFor={'kurs'}>Kurs</label>
-                                    <input id="kurs" type="text" defaultValue={price} readOnly ref={kursInputRef} />
+                                    <input id="kurs" type="text" value={price} readOnly />
                                 </div>
                             </div>
                         </div>
@@ -214,36 +213,38 @@ function KupWaluteForm(props) {
 
                                     <div className={classes.control}>
                                         <label htmlFor={'cena'}>Cena</label>
-                                        <input id="cena" type="text" defaultValue={ilosc * price} readOnly ref={cenaInputRef} />
+                                        <input id="cena" type="text" value={ilosc * price} readOnly />
                                     </div>
                                 </div>
                             </div>
                             <div className={classes.actions}>
-                                <button>Kup</button>
+                                <button className="btn btn-secondary px-4">Kup</button>
                             </div>
                         </div>
                     </div>
                 </form>
             </LargeCard>
-            <LargeCard>
-                <Plot price={price} data={pastData} days={dni}/>
-                <div className="container">
-                    <div className="row ms-sm-5">
-                        <div className="col-sm">
-                            <input type="radio" className="btn-check" name="days" id="30" autoComplete="off" onClick={(e) => {setDni(30)}} />
-                            <label className="btn btn-secondary px-5" htmlFor="30">30 Dni</label>
-                        </div>
-                        <div className="col-sm">
-                            <input type="radio" className="btn-check" name="days" id="14" autoComplete="off" onClick={(e) => {setDni(14)}} />
-                            <label className="btn btn-secondary px-5" htmlFor="14">14 Dni</label>
-                        </div>
-                        <div className="col-sm">
-                            <input type="radio" className="btn-check" name="days" id="7" autoComplete="off" defaultChecked onClick={(e) => {setDni(7)}} />
-                            <label className="btn btn-secondary px-5" htmlFor="7">7 Dni</label>
+            {pastData &&
+                <LargeCard>
+                    <Plot price={price} data={pastData} days={dni} />
+                    <div className="container my-4 ms-5">
+                        <div className="row ms-5">
+                            <div className="col-sm">
+                                <input type="radio" className="btn-check" name="days" id="30" autoComplete="off" onClick={(e) => { setDni(30) }} />
+                                <label className="btn btn-secondary px-5" htmlFor="30">30 Dni</label>
+                            </div>
+                            <div className="col-sm">
+                                <input type="radio" className="btn-check" name="days" id="14" autoComplete="off" onClick={(e) => { setDni(14) }} />
+                                <label className="btn btn-secondary px-5" htmlFor="14">14 Dni</label>
+                            </div>
+                            <div className="col-sm">
+                                <input type="radio" className="btn-check" name="days" id="7" autoComplete="off" defaultChecked onClick={(e) => { setDni(7) }} />
+                                <label className="btn btn-secondary px-5" htmlFor="7">7 Dni</label>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </LargeCard>
+                </LargeCard>
+            }
         </>
     )
 }
