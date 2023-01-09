@@ -46,7 +46,7 @@ class Post(posts_db.Model):
         self.tresc = tresc
 
     def __repr__(self):
-        return f"Post {self.tytul}, {self.dataUtworzenia}"
+        return f"Post {self.tytul}, {self.dataUtworzenia}, {self.tresc}"
 
 
 class EdycjePostu(posts_db.Model):
@@ -114,11 +114,6 @@ class userSchema(posts_ma.Schema):
 user_schema = userSchema()
 users_schema = userSchema(many=True)
 
-
-
-
-# and all the routes for our API to work
-
 @posts_app.route('/get', methods=['GET'])
 @cross_origin()
 def getPosts():
@@ -150,13 +145,14 @@ def editPost(id):
     updatedTresc = request.json['tresc']
     updatedTytul = request.json['tytul']
 
-    edycja = EdycjePostu(post.tresc, post.id, 0)  # tu potem zamiast 0 bedzie id zalogowanego uzytkownika
+    # edycja = EdycjePostu(post.tresc, id, 0)  # tu potem zamiast 0 bedzie id zalogowanego uzytkownika
     post.tresc = updatedTresc
-    post.tytul = request.json['tytul']
-    post.status = StatusPostu.EDYTOWANY
+    post.tytul = updatedTytul
+    post.dataUtworzenia = datetime.utcnow()
+    post.status = StatusPostu.EDYTOWANY.value
 
-    updatedPost = update(Post).values(tytul=updatedTytul, tresc=updatedTresc).where(Post.columns.id == id)
-    posts_db.session.add(edycja)
+
+    # posts_db.session.add(edycja)
     posts_db.session.commit()
 
     return post_schema.jsonify(post)
@@ -184,10 +180,6 @@ def addUser():
     posts_db.session.commit()
 
     return user_schema.jsonify(user)
-
-
-
-
 
 
 if __name__ == '__main__':
