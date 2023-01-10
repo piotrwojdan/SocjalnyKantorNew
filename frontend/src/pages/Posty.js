@@ -1,6 +1,5 @@
 import React from "react"
 import PostyList from "../components/posty/PostyList"
-import React from "react"
 import { useState } from "react"
 import EdytujPostForm from "../components/posty/EdytujPostForm"
 
