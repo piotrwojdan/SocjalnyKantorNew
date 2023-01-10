@@ -11,7 +11,7 @@ export const formatData = (data) => {
         }
       ]
     };
-  
+    
     let dates = data.map((val) => {
       const ts = val[0];
       let date = new Date(ts * 1000);
@@ -31,6 +31,7 @@ export const formatData = (data) => {
     dates.reverse();
     finalData.labels = dates;
     finalData.datasets[0].data = priceArr;
+
 
     return finalData;
   };
