@@ -213,7 +213,7 @@ function KupWaluteForm(props) {
 
                                     <div className={classes.control}>
                                         <label htmlFor={'cena'}>Cena</label>
-                                        <input id="cena" type="text" value={ilosc * price} readOnly />
+                                        <input id="cena" type="text" value={(ilosc * price).toFixed(2)} readOnly />
                                     </div>
                                 </div>
                             </div>

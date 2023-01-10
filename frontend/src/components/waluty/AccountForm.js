@@ -1,8 +1,20 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import classes from './CardForm.module.css'
 
 function AccountForm() {
     const [accounts, setAccounts] = useState([]);
+
+    useEffect(() => {
+        fetch("http://127.0.0.1:5003/accounts", {
+            'method': 'GET',
+            'headers': {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(resp => resp.json())
+            .then(resp => setAccounts(resp))
+            .catch(err => console.log(err))
+    }, [])
 
     return (
         <div className="container my-4">

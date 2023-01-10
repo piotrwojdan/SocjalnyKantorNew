@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import classes from './CardForm.module.css'
 
 
 function CardForm(props) {
-
+    const [cardNumber, setCardNumber] = useState("")
 
     function submitHandler(event) {
         event.preventDefault();
@@ -27,7 +27,14 @@ function CardForm(props) {
     function handleCardNumber(e) {
         let number = e.target.value
 
-        return number.match()
+        if (number.match(/^(?:4[0-9]{12}(?:[0-9]{3})?) | (?:5[1-5][0-9]{2} | 222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)[0-9]{12}/))
+            setCardNumber(number)
+    }
+
+    function handleNumber(e) {
+        let input = e.target.value
+        if(input.match(/^\d+$/))
+            setCardNumber(input)
     }
 
     return (
@@ -35,7 +42,7 @@ function CardForm(props) {
             <div className="container">
                 <div className={classes.control}>
                     <label htmlFor={'number'}>Numer karty</label>
-                    <input id="number" type="text" onChange={handleCardNumber}/>
+                    <input id="number" type="text" value={cardNumber} onChange={handleNumber} onBlur={handleCardNumber}/>
                 </div>
                 <div className={classes.control}>
                     <label htmlFor={'name'}>
