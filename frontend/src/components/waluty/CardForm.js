@@ -1,71 +1,62 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import classes from './CardForm.module.css'
+import { useNavigate } from 'react-router-dom'
+import { usePaymentInputs } from 'react-payment-inputs'
+import { Form } from 'react-bootstrap'
+
 
 
 function CardForm(props) {
-    const [cardNumber, setCardNumber] = useState("")
+    const navigate = useNavigate();
+    const { meta, getCardNumberProps, getExpiryDateProps, getCVCProps } = usePaymentInputs();
+
+    const { erroredInputs, touchedInputs } = meta;
 
     function submitHandler(event) {
         event.preventDefault();
 
-        // const enteredWaluta = walutaInputRef.current.value; 
-        // const enteredilosc = iloscInputRef.current.value;
-        // const enteredKurs = price;
-        // const enteredCena = price * parseFloat(enteredilosc);
+        const moretransactionData = {
+            nrKarty: touchedInputs.cardNumber
+        }
+        console.log(moretransactionData)
 
-        // const transactionData = {
-        //     waluta: enteredWaluta,
-        //     ilosc: enteredilosc,
-        //     cena: enteredCena,
-        //     kurs: enteredKurs
-        // }
-        // console.log(transactionData)
-
-        // props.onSubmitForm(transactionData)
-    }
-
-    function handleCardNumber(e) {
-        let number = e.target.value
-
-        if (number.match(/^(?:4[0-9]{12}(?:[0-9]{3})?) | (?:5[1-5][0-9]{2} | 222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)[0-9]{12}/))
-            setCardNumber(number)
-    }
-
-    function handleNumber(e) {
-        let input = e.target.value
-        if(input.match(/^\d+$/))
-            setCardNumber(input)
+        props.onSubmitForm(moretransactionData)
     }
 
     return (
         <form className={classes.form} onSubmit={submitHandler}>
-            <div className="container">
-                <div className={classes.control}>
-                    <label htmlFor={'number'}>Numer karty</label>
-                    <input id="number" type="text" value={cardNumber} onChange={handleNumber} onBlur={handleCardNumber}/>
-                </div>
-                <div className={classes.control}>
-                    <label htmlFor={'name'}>
-                        Imię i nazwisko właściciela
-                    </label>
-                    <input id="name" type="text" />
-                </div>
-                <div className={classes.control}>
-                    <label htmlFor={'data'}>Data wazności</label>
-                    <input
-                        id="data"
-                        min="0"
-                    />
-                </div>
-                <div className={classes.control}>
-                    <label htmlFor={'kod'}>CCV</label>
-                    <input id="kod" type="text" />
-                </div>
-                <div className={classes.actions}>
-                    <button>Kup</button>
-                </div>
+            <div className={classes.control}>
+                <Form.Label>Card number</Form.Label>
+                <Form.Control
+                    {...getCardNumberProps()}
+                    // ref={numberInputRef}
+                    isInvalid={touchedInputs.cardNumber && erroredInputs.cardNumber}
+                    placeholder="0000 0000 0000 0000"
+                />
+                <Form.Control.Feedback type="invalid">{erroredInputs.cardNumber}</Form.Control.Feedback>
             </div>
-        </form>
+            <div className={classes.control}>
+                <Form.Label>Expiry date</Form.Label>
+                <Form.Control
+                    {...getExpiryDateProps()}
+                    isInvalid={touchedInputs.expiryDate && erroredInputs.expiryDate}
+                />
+                <Form.Control.Feedback type="invalid">{erroredInputs.expiryDate}</Form.Control.Feedback>
+            </div>
+            <div className={classes.control}>
+                <Form.Label>CVC</Form.Label>
+                <Form.Control
+                    {...getCVCProps()}
+                    isInvalid={touchedInputs.cvc && erroredInputs.cvc}
+                    placeholder="123"
+                />
+                <Form.Control.Feedback type="invalid">{erroredInputs.cvc}</Form.Control.Feedback>
+            </div>
+            <div className={classes.actions}>
+                <button className='btn btn-danger mb-4 ' onClick={(e) => {navigate(-1)}}>Anuluj</button>
+                <input type="submit" className='btn btn-primary mb-4 px-3' value="Kup"/>
+            </div>
+        </form >
     )
 }
 

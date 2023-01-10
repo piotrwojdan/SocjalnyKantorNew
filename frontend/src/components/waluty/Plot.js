@@ -15,22 +15,25 @@ function Plot({ price, data, days }) {
   };
 
   if (price !== "0.00") {
+    if (Object.keys(data).length !== 0) {
     data.datasets[0].data = data.datasets[0].data.slice(-days);
     data.labels = data.labels.slice(-days);
+    }
   }
 
   if (price === "0.00") {
     return <h2>please select a currency pair</h2>;
   }
+
+  if (Object.keys(data).length !== 0) {
   return (
     <div className="dashboard">
-      <h2>{`$${price}`}</h2>
-
       <div className="chart-container">
         {data && <Line data={data} options={opts} />}
       </div>
     </div>
   );
+  } else return <></>
 }
 
 export default Plot;

@@ -10,6 +10,12 @@ function Summary() {
     const location = useLocation();
     const transactionData = location.state
 
+    function sumbitHandler(event) {
+        // tu potrzebuje zapis do bazy 
+        // i jakis modal ze sukces operacji
+
+    }
+
     const [payment, setPayment] = useState("")
 
     return (
@@ -86,7 +92,7 @@ function Summary() {
                     </div>
                 </div>
 
-                <PaymentForm payment={payment}/>
+                <PaymentForm payment={payment} submitHandler={sumbitHandler}/>
             </LargeCard>
         </>
     )

@@ -4,13 +4,13 @@ import { useRef, useEffect, useState } from "react"
 import React from "react";
 import { formatData } from "../utils"
 import Plot from "./Plot";
-import { Form } from "react-router-dom";
 
 function KupWaluteForm(props) {
 
     const [pair, setpair] = useState("");
     const [price, setprice] = useState("0.00");
     const [pastData, setpastData] = useState({});
+    const [loading, setLoading] = useState(false);
 
     const ws = useRef(null);
     let first = useRef(false);
@@ -63,6 +63,7 @@ function KupWaluteForm(props) {
         if (!first.current) {
             return;
         }
+        setLoading(true);
 
         let msg = {
             type: "subscribe",
@@ -78,7 +79,8 @@ function KupWaluteForm(props) {
             let dataArr = [];
             await fetch(historicalDataURL)
                 .then((res) => res.json())
-                .then((data) => (dataArr = data));
+                .then((data) => (dataArr = data))
+                .catch(err => console.log(err));
 
             //helper function to format data that will be implemented later
             let formattedData = formatData(dataArr);
@@ -86,6 +88,7 @@ function KupWaluteForm(props) {
         };
 
         fetchHistoricalData();
+        setLoading(false);
         //need to update event listener for the websocket object so that it is listening for the newly updated currency pair
         ws.current.onmessage = (e) => {
             let data = JSON.parse(e.data);
@@ -172,8 +175,8 @@ function KupWaluteForm(props) {
 
     }
 
-    return (
-        <>
+    if (loading) {
+        return (
             <LargeCard>
                 <form className={classes.form} onSubmit={submitHandler}>
                     <div className="container">
@@ -224,7 +227,62 @@ function KupWaluteForm(props) {
                     </div>
                 </form>
             </LargeCard>
-            {pastData &&
+        )
+    } else {
+
+        return (
+            <>
+                <LargeCard>
+                    <form className={classes.form} onSubmit={submitHandler}>
+                        <div className="container">
+                            <div className="row">
+                                <div className="col-sm">
+                                    <div className={classes.control}>
+                                        <div className="ms-2">
+                                            <label htmlFor={'waluta'}>Waluta</label>
+                                            <select className="form-select" type="text" required id="waluta" ref={walutaInputRef} onChange={handleSelect}>
+                                                {currencies.map((cur) => { return <option key={cur.id} value={cur.id}>{cur.id}</option> })}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-sm">
+                                    <div className={classes.control}>
+                                        <label htmlFor={'kurs'}>Kurs</label>
+                                        <input id="kurs" type="text" value={price} readOnly />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="container">
+                                <div className="row">
+                                    <div className="col-sm">
+                                        <div className={classes.control}>
+                                            <label htmlFor={'ilosc'}>Ilość</label>
+                                            <input
+                                                id="ilosc"
+                                                min="0"
+                                                value={ilosc}
+                                                onChange={handleNumber}
+                                                onBlur={handleFloat}
+                                                ref={iloscInputRef} />
+                                        </div>
+                                    </div>
+                                    <div className="col-sm">
+
+                                        <div className={classes.control}>
+                                            <label htmlFor={'cena'}>Cena</label>
+                                            <input id="cena" type="text" value={(ilosc * price).toFixed(2)} readOnly />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className={classes.actions}>
+                                    <button className="btn btn-secondary px-4">Kup</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </LargeCard>
+
                 <LargeCard>
                     <Plot price={price} data={pastData} days={dni} />
                     <div className="container my-4 ms-5">
@@ -244,9 +302,10 @@ function KupWaluteForm(props) {
                         </div>
                     </div>
                 </LargeCard>
-            }
-        </>
-    )
+
+            </>
+        )
+    }
 }
 
 export default KupWaluteForm;

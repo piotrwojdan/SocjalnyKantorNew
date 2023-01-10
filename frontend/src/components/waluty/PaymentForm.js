@@ -2,12 +2,12 @@ import React from 'react'
 import AccountForm from './AccountForm'
 import CardForm from './CardForm'
 
-function PaymentForm({payment}) {
+function PaymentForm({payment, submitHandler}) {
 
   if (payment === "card") {
-    return <CardForm />
+    return <CardForm onSubmitForm={submitHandler}/>
   } else if (payment === "account") {
-    return <AccountForm />
+    return <AccountForm onSubmitForm={submitHandler}/>
   } else {
     return <></>
   }
