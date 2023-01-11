@@ -1,17 +1,18 @@
-import { Routes, Route } from "react-router-dom"
-import React, { useEffect, useState } from "react"
+import { Routes, Route } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 //importujemy komponenty czyli strony które będziemy wyświetlać
-import DodajPost from "./pages/DodajPost"
-import Layout from "./components/layout/Layout"
-import About from "./components/About"
-import Posty from "./pages/Posty"
-import EdytujPostForm from "./components/posty/EdytujPostForm"
-import WymianaWalut from "./pages/WymianaWalut"
-import Summary from "./components/waluty/Summary"
-
+import DodajPost from "./pages/DodajPost";
+import Layout from "./components/layout/Layout";
+import About from "./components/About";
+import Posty from "./pages/Posty";
+import EdytujPostForm from "./components/posty/EdytujPostForm";
+import WymianaWalut from "./pages/WymianaWalut";
+import Summary from "./components/waluty/Summary";
+import Login from "./components/Login";
+import Logout from "./components/Logout";
 
 function App() {
-  const [posts, setPosts] = useState([])
+  const [posts, setPosts] = useState([]);
 
   //dzięki useEffects wykona się tylko raz
   useEffect(() => {
@@ -23,8 +24,8 @@ function App() {
     })
       .then((resp) => resp.json())
       .then((resp) => setPosts(resp))
-      .catch((err) => console.log(err))
-  }, [])
+      .catch((err) => console.log(err));
+  }, []);
 
   return (
     //tutaj musicie dodać swoje ścieżki//////////////////////////////////////////////////
@@ -37,9 +38,11 @@ function App() {
         <Route path="/edytujpost/:id" element={<EdytujPostForm />} />
         <Route path="/exchange" element={<WymianaWalut />} />
         <Route path="/exchange/summary" element={<Summary />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/logout" element={<Logout />} />
       </Routes>
     </Layout>
-  )
+  );
 }
 
-export default App
+export default App;

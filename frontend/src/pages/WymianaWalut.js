@@ -4,9 +4,8 @@ import KupWaluteForm from '../components/waluty/KupWaluteForm';
 
 function WymianaWalut() {
     const navigate = useNavigate();
-    function addTransaction(meetupData) {
-        //fetch i zapis do bazy
-        navigate('/exchange/summary');
+    function addTransaction(transactionData) {
+        navigate('/exchange/summary',{state: transactionData});
     }
 
     return (<section>

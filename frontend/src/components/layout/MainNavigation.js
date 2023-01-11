@@ -24,9 +24,6 @@ function MainNavigation(){
             <Link to="/exchange">Wymiana walut</Link>
           </li>
           <li>
-            <Link to="/plots">Wykresy</Link>
-          </li>
-          <li>
             <Link to="/about">O nas</Link>
           </li>
           <li>
