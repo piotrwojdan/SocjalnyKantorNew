@@ -13,7 +13,8 @@ function DodajPost() {
       },
       body: JSON.stringify({tytul: meetupData.tytul, tresc: meetupData.tresc})
     }).then(res => res.json())
-      .then(res => console.log(res));
+      .then(res => console.log(res))
+      .then(() => {window.location.reload(false)})
 
 
     navigate("/")

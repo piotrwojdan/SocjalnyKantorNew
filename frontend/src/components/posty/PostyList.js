@@ -32,8 +32,8 @@ function PostyList(props) {
   }
 
   const formatDate = (date) => {
-    Moment.locale('en');
-    return Moment(date).format('DD.MM.YY - H:m')
+    Moment.locale('pl');
+    return Moment(date).format('DD.MM.YY - HH:mm')
   }
 
   return (

@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS, cross_origin
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from sqlalchemy import update
 
@@ -31,7 +31,7 @@ class StatusPostu(Enum):
 class Post(posts_db.Model):
     id = posts_db.Column(posts_db.Integer, primary_key=True)
     tytul = posts_db.Column(posts_db.String(150), nullable=False)
-    dataUtworzenia = posts_db.Column(posts_db.DateTime, nullable=False, default=datetime.utcnow())
+    dataUtworzenia = posts_db.Column(posts_db.DateTime, nullable=False, default=datetime.now())
     tresc = posts_db.Column(posts_db.Text, nullable=False)
     status = posts_db.Column(posts_db.String(10), default=StatusPostu.NOWY.value)
     client_id = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("klient.id"), nullable=True) # user.id z małej bo odwołujemy się do tablicy
@@ -52,7 +52,7 @@ class Post(posts_db.Model):
 class EdycjePostu(posts_db.Model):
     id = posts_db.Column(posts_db.Integer, primary_key=True)
     zawartosc = posts_db.Column(posts_db.Text, nullable=False)
-    dataEdycji = posts_db.Column(posts_db.DateTime, nullable=False, default=datetime.utcnow())
+    dataEdycji = posts_db.Column(posts_db.DateTime, nullable=False, default=datetime.now(timezone.utc))
     post = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("post.id"), nullable=False)
     edytujacy = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("admin.id"), nullable=False)
 
@@ -132,7 +132,7 @@ def addPost():
     tresc = request.json['tresc']
 
     post = Post(tytul, tresc)
-
+    print(post.dataUtworzenia)
     posts_db.session.add(post)
     posts_db.session.commit()
 
@@ -148,7 +148,7 @@ def editPost(id):
     # edycja = EdycjePostu(post.tresc, id, 0)  # tu potem zamiast 0 bedzie id zalogowanego uzytkownika
     post.tresc = updatedTresc
     post.tytul = updatedTytul
-    post.dataUtworzenia = datetime.utcnow()
+    post.dataUtworzenia = datetime.now()
     post.status = StatusPostu.EDYTOWANY.value
 
 
