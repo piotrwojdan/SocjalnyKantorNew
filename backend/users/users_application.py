@@ -6,7 +6,7 @@ from abc import ABCMeta
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from flask_login import current_user
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import requests, json
 
 users_app = Flask(__name__)
@@ -106,10 +106,24 @@ def create_token():
     return jsonify(access_token=access_token)
 
 
-@users_app.route("/login", methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated:  # sprawdzamy czy jest już zalogowany
-        return 
+@users_app.route("/user", methods=['GET'])
+@jwt_required()
+@cross_origin()
+def getUser():
+    login = get_jwt_identity()
+
+    response = jsonify({"login": login})
+
+    return response
+
+
+@users_app.after_request
+def after_request(response):
+  response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')  # http://localhost:3000/
+  response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+  response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+  response.headers.add('Access-Control-Allow-Credentials', 'true')
+  return response
 
 
 

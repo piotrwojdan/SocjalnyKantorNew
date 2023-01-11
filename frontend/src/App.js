@@ -10,6 +10,7 @@ import WymianaWalut from "./pages/WymianaWalut";
 import Summary from "./components/waluty/Summary";
 import Login from "./components/Login";
 import Logout from "./components/Logout";
+import Test from "./components/Test"
 
 function App() {
   const [posts, setPosts] = useState([]);
@@ -40,6 +41,7 @@ function App() {
         <Route path="/exchange/summary" element={<Summary />} />
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
+        <Route path="/account" element={<Test />} />
       </Routes>
     </Layout>
   );
