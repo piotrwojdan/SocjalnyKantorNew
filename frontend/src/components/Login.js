@@ -26,6 +26,7 @@ const Login = () => {
       .then((data) => {
         console.log("backend -> ", data);
         sessionStorage.setItem("token", data.access_token);
+        // sessionStorage.setItem("id", )
       })
       .catch((err) => {
         console.error("Blad", err);
