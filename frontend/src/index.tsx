@@ -1,5 +1,9 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+
+// import React from 'react';
+// import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css"
@@ -7,15 +11,20 @@ import "../node_modules/bootstrap/dist/js/bootstrap.bundle.min"
 
 import './index.css';
 import App from './App';
+//
+// const root = ReactDOM.createRoot(document.getElementById('root'));
+// root.render(
+//   <BrowserRouter>
+//     <App />
+//   </BrowserRouter>
+// );
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
+ReactDOM.render(
   <BrowserRouter>
     <App />
-  </BrowserRouter>
+  </BrowserRouter>,
+  document.getElementById('root') as HTMLElement
 );
-
-
 
 // import React from "react"
 // import ReactDOM from "react-dom/client"

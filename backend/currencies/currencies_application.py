@@ -12,6 +12,7 @@ currencies_db = SQLAlchemy(currencies_app)
 currencies_ma = Marshmallow(currencies_app)
 
 
+
 class CurrencySchema(currencies_ma.Schema):
     class Meta:
         fields = ('id', 'symbol', 'nazwa')

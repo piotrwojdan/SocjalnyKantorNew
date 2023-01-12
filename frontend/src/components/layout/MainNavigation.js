@@ -27,13 +27,13 @@ function MainNavigation(){
             <Link to="/about">O nas</Link>
           </li>
           <li>
-            <Link to="/account">Konto</Link>
+            <Link to="/konto">Konto</Link>
           </li>
           <li>
             <Link to="/login">Zaloguj się</Link>
           </li>
           <li>
-            <Link to="/signup">Rejestracja</Link>
+            <Link to="/register">Rejestracja</Link>
           </li>
           <li>
             <Link to="/logout">Wyloguj</Link>
