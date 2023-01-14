@@ -1,8 +1,12 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_cors import CORS, cross_origin
 
 currencies_app = Flask(__name__)
+
+CORS(currencies_app)
+currencies_app.config['CORS_HEADERS'] = 'Content-Type'
 
 currencies_app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 currencies_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///currencies.db'

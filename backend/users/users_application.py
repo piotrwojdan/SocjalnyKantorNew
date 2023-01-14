@@ -13,7 +13,7 @@ from flask_session import Session
 
 
 users_app = Flask(__name__)
-CORS(users_app, withCredentials=True)
+CORS(users_app, supports_credentials=True)
 
 users_app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 users_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
@@ -54,11 +54,12 @@ class User(users_db.Model):
     # def load_user(user_id):
     #     return Klient.query.get(int(user_id))  # był tu user
 
-    def __init__(self, imie, nazwisko, login, haslo, czyAdmin=False):
+    def __init__(self, imie, nazwisko, login, haslo, dataUrodzenia, czyAdmin=False):
         self.imie = imie
         self.nazwisko = nazwisko
         self.login = login
         self.haslo = bcrypt.generate_password_hash(haslo)
+        self.dataUrodzenia = dataUrodzenia
         self.czyAdmin = czyAdmin
 
     def __repr__(self):
@@ -92,22 +93,22 @@ def register():
     nazwisko = request.json['nazwisko']
     login = request.json['login']
     haslo = request.json['haslo']
-    # dataUrodzenia = datetime.strptime(request.json['dataUrodzenia'], "%d.%m.%Y")
+    dataUrodzenia = datetime.strptime(request.json['dataUrodzenia'], "%d.%m.%Y")
 
     user_exists = User.query.filter_by(login=login).first() is not None
 
     if user_exists:
         return jsonify({"error": "Użytkownik już istnieje"}), 409
 
-    new_user = User(imie=imie, nazwisko=nazwisko, login=login, haslo=haslo)#, dataUrodzenia=dataUrodzenia
+    new_user = User(imie=imie, nazwisko=nazwisko, login=login, haslo=haslo, dataUrodzenia=dataUrodzenia)
 
     # to jest po to zeby sie uzytkownicy tez dodawali w pozostalych czesciach aplikacji
     # to_send = {'id': f'{new_user.id}', 'imie': imie, 'nazwisko': nazwisko}
     # requests.post(POSTS_URL + "user/add", json=to_send)
     # requests.post(CURRENCIES_URL + "user/add", json=to_send)
 
-    # users_db.session.add(new_user)
-    # users_db.session.commit()
+    users_db.session.add(new_user)
+    users_db.session.commit()
 
     session["user_id"] = new_user.id
 
@@ -139,6 +140,11 @@ def logout():
     session.pop("user_id")
 
     return "200"
+
+@users_app.after_request
+def after_each(response):
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
 
 if __name__ == '__main__':
     # with users_app.app_context():

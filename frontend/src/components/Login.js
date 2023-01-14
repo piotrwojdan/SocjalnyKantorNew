@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-
 import axios from "axios";
-// const axios = require('axios').default;
+
 
 const axio = axios.create({
   withCredentials: true,
@@ -13,7 +12,7 @@ const Login = () => {
 
   const logInUser = async () => {
     try {
-        const resp = await axio.post('http://localhost:5002/login', { login, haslo,})
+        const resp = await axio.post('http://localhost:5002/login', { login, haslo})
         console.log(resp.data);
         window.location.href = "/konto"
     } catch (err) {
@@ -33,7 +32,7 @@ const Login = () => {
             type="text"
             value={login}
             onChange={(e) => setLogin(e.target.value)}
-            id=""
+            id="login"
           />
         </div>
         <div>
@@ -42,7 +41,7 @@ const Login = () => {
             type="password"
             value={haslo}
             onChange={(e) => setHaslo(e.target.value)}
-            id=""
+            id="password"
           />
         </div>
         <button type="button" onClick={() => logInUser()}>
