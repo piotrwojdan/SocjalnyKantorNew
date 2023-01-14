@@ -168,18 +168,18 @@ def deletePost(id):
     return post_schema.jsonify(post)
 
 
-@posts_app.route('/user/add', methods=['POST'])
-def addUser():
-    id = request.json['id']
-    imie = request.json['imie']
-    nazwisko = request.json['nazwisko']
-
-    user = Klient(id, imie, nazwisko)
-
-    posts_db.session.add(user)
-    posts_db.session.commit()
-
-    return user_schema.jsonify(user)
+# @posts_app.route('/user/add', methods=['POST'])
+# def addUser():
+#     id = request.json['id']
+#     imie = request.json['imie']
+#     nazwisko = request.json['nazwisko']
+#
+#     user = Klient(id, imie, nazwisko)
+#
+#     posts_db.session.add(user)
+#     posts_db.session.commit()
+#
+#     return user_schema.jsonify(user)
 
 
 if __name__ == '__main__':

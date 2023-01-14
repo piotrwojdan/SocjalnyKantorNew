@@ -17,9 +17,6 @@ const Login = () => {
         console.log(resp.data);
         window.location.href = "/konto"
     } catch (err) {
-        // // Handle Error Here
-        // console.error(err);
-
        if (err.response.status === 401){
            alert("Invalid credentials");
        }
@@ -49,7 +46,7 @@ const Login = () => {
           />
         </div>
         <button type="button" onClick={() => logInUser()}>
-          Submit
+          Zaloguj
         </button>
       </form>
     </div>

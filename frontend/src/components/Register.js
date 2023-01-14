@@ -1,60 +1,79 @@
 import React, { useState } from "react";
+import httpClient from "./httpClient"
 
-const Login = () => {
-  const [login, setLogin] = useState("");
-  const [haslo, setHaslo] = useState("");
+// import axios from "axios";
+// // const axios = require('axios').default;
+//
+// const axio = axios.create({
+//   withCredentials: true,
+// });
 
-  const token = sessionStorage.getItem("token");
-  console.log("Twoj token " + token);
-
-  const handleClick = () => {
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        login: login,
-        haslo: haslo,
-      }),
-    };
-    fetch("http://127.0.0.1:5002/token", options)
-      .then((resp) => {
-        if (resp.status === 200) return resp.json();
-        else alert("Jakis blad");
-      })
-      .then((data) => {
-        console.log("backend -> ", data);
-        sessionStorage.setItem("token", data.access_token);
-      })
-      .catch((err) => {
-        console.error("Blad", err);
-      });
-  };
+const Register = () => {
+//   const [login, setLogin] = useState("");
+//   const [haslo, setHaslo] = useState("");
+//   const [imie, setImie] = useState("");
+//   const [nazwisko, setNazwisko] = useState("");
+//
+//
+//   const registerUser = async () => {
+//     try {
+//         const resp = await axio.post('http://localhost:5002/register', {imie, nazwisko, login, haslo,})
+//         console.log("Błąd")
+//         console.log(resp.data);
+//         window.location.href = "/konto"
+//     } catch (err) {
+//        if (err.response.status === 401){
+//            alert("Invalid credentials");
+//        }
+//     }
+// };
 
   return (
-    <div className="content-section">
-      <h1>Zaloguj się</h1>
-
-      {token && token != "" && token != undefined ? (
-        "Jestes zalogowany tokenem " + token
-      ) : (
-        <div>
-          <input
-            type="text"
-            value={login}
-            onChange={(e) => setLogin(e.target.value)}
-          />
-          <input
-            type="password"
-            value={haslo}
-            onChange={(e) => setHaslo(e.target.value)}
-          />
-          <button onClick={handleClick}>Potwierdź</button>
-        </div>
-      )}
+    <div>
+      <h1>Utwórz konto</h1>
+      <form>
+        {/* <div>*/}
+        {/*  <label>Imie: </label>*/}
+        {/*  <input*/}
+        {/*    type="text"*/}
+        {/*    value={imie}*/}
+        {/*    // onChange={(e) => setImie(e.target.value)}*/}
+        {/*    id="imie"*/}
+        {/*  />*/}
+        {/*</div>*/}
+        {/* <div>*/}
+        {/*  <label>Nazwisko: </label>*/}
+        {/*  <input*/}
+        {/*    type="text"*/}
+        {/*    value={nazwisko}*/}
+        {/*    // onChange={(e) => setNazwisko(e.target.value)}*/}
+        {/*    id="nazwisko"*/}
+        {/*  />*/}
+        {/*</div>*/}
+        {/*<div>*/}
+        {/*  <label>Login: </label>*/}
+        {/*  <input*/}
+        {/*    type="text"*/}
+        {/*    value={login}*/}
+        {/*    // onChange={(e) => setLogin(e.target.value)}*/}
+        {/*    id="login"*/}
+        {/*  />*/}
+        {/*</div>*/}
+        {/*<div>*/}
+        {/*  <label>Hasło: </label>*/}
+        {/*  <input*/}
+        {/*    type="password"*/}
+        {/*    value={haslo}*/}
+        {/*    // onChange={(e) => setHaslo(e.target.value)}*/}
+        {/*    id="haslo"*/}
+        {/*  />*/}
+        {/*</div>*/}
+        {/*<button type="button" onClick={() => registerUser()}>*/}
+        {/*  Utwórz*/}
+        {/*</button>*/}
+      </form>
     </div>
   );
 };
 
-export default Login;
+export default Register;

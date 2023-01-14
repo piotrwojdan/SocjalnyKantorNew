@@ -6,6 +6,7 @@ import React from "react"
 import Moment from 'moment';
 import { useState } from "react"
 import PostItem from "./PostItem"
+import PotwierdzenieUsuniecia from "../../pages/PotwierdzenieUsuniecia"
 
 //mapujemy listę postów z props
 function PostyList(props) {
@@ -19,6 +20,7 @@ function PostyList(props) {
 
   const usunPost = (post) => {
     console.log(post.id)
+
     return fetch(`http://127.0.0.1:5001/delete/${post.id}`, {
       method: "DELETE",
       headers: {
@@ -52,10 +54,13 @@ function PostyList(props) {
               </div>
 
               <div className={classes2.actions}>
-                <button onClick={() => usunPost(post)}>Usuń</button>
+                {/*sprawdzenie id tego użytkownika*/}
+                {/*<button onClick={() => usunPost(post)}>Usuń</button>*/}
+                <button onClick={() => PotwierdzenieUsuniecia(post = post)}>Usuń</button>
                 <p> </p>
                 {/*<button onClick={() => editPost(post)}>Edytuj</button>*/}
                 <button onClick={() => navigateToEdit(post)}>Edytuj</button>
+
               </div>
             </Card>
           )

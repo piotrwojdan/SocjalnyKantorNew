@@ -13,14 +13,15 @@ from flask_session import Session
 
 
 users_app = Flask(__name__)
-CORS(users_app, supports_credentials=True)
+CORS(users_app, withCredentials=True)
 
 users_app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 users_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 users_app.config['SESSION_TYPE'] = 'redis'
+users_app.config['CORS_HEADERS'] = 'Content-Type'
 
-POSTS_URL = 'http://localhost:5001/'
-CURRENCIES_URL = 'http://localhost:5003/'
+# POSTS_URL = 'http://localhost:5001/'
+# CURRENCIES_URL = 'http://localhost:5003/'
 
 users_db = SQLAlchemy(users_app)
 users_ma = Marshmallow(users_app)
@@ -53,12 +54,11 @@ class User(users_db.Model):
     # def load_user(user_id):
     #     return Klient.query.get(int(user_id))  # był tu user
 
-    def __init__(self, imie, nazwisko, login, haslo, dataUrodzenia, czyAdmin=False):
+    def __init__(self, imie, nazwisko, login, haslo, czyAdmin=False):
         self.imie = imie
         self.nazwisko = nazwisko
         self.login = login
         self.haslo = bcrypt.generate_password_hash(haslo)
-        self.dataUrodzenia = dataUrodzenia
         self.czyAdmin = czyAdmin
 
     def __repr__(self):
@@ -74,6 +74,7 @@ user_schema = UserSchema()
 users_schema = UserSchema(many=True)
 
 @users_app.route("/@me")
+@cross_origin()
 def get_current_user():
     user_id = session.get("user_id")
 
@@ -85,54 +86,37 @@ def get_current_user():
 
 
 @users_app.route("/register", methods=['POST'])
+@cross_origin()
 def register():
     imie = request.json['imie']
     nazwisko = request.json['nazwisko']
     login = request.json['login']
     haslo = request.json['haslo']
-    dataUrodzenia = datetime.strptime(request.json['dataUrodzenia'], "%d.%m.%Y")
-
-    # user = User(imie, nazwisko, login, haslo, dataUrodzenia)
-    #
-    # users_db.session.add(user)
-    # users_db.session.commit()
+    # dataUrodzenia = datetime.strptime(request.json['dataUrodzenia'], "%d.%m.%Y")
 
     user_exists = User.query.filter_by(login=login).first() is not None
 
     if user_exists:
         return jsonify({"error": "Użytkownik już istnieje"}), 409
 
-    new_user = User(imie=imie, nazwisko=nazwisko, login=login, haslo=haslo, dataUrodzenia=dataUrodzenia)
+    new_user = User(imie=imie, nazwisko=nazwisko, login=login, haslo=haslo)#, dataUrodzenia=dataUrodzenia
 
     # to jest po to zeby sie uzytkownicy tez dodawali w pozostalych czesciach aplikacji
-    #czemu tutja nie ma reszty atrybutów??
-    to_send = {'id': f'{new_user.id}', 'imie': imie, 'nazwisko': nazwisko}
-    requests.post(POSTS_URL + "user/add", json=to_send)
-    requests.post(CURRENCIES_URL + "user/add", json=to_send)
+    # to_send = {'id': f'{new_user.id}', 'imie': imie, 'nazwisko': nazwisko}
+    # requests.post(POSTS_URL + "user/add", json=to_send)
+    # requests.post(CURRENCIES_URL + "user/add", json=to_send)
 
-    users_db.session.add(new_user)
-    users_db.session.commit()
+    # users_db.session.add(new_user)
+    # users_db.session.commit()
+
+    session["user_id"] = new_user.id
 
     return user_schema.jsonify(new_user)
 
 
-@users_app.route("/token", methods=['POST'])
-def create_token():
-    login = request.json.get('login', None)
-    haslo = request.json.get('haslo', None)
-
-    # Sprawdzanie poprawnosci tutaj powinno byc
-    if login != 'test' or haslo != 'test':
-        return jsonify({'msg': 'Zle dane'}), 401
-
-    access_token = create_access_token(identity=login)
-    return jsonify(access_token=access_token)
-
-
 @users_app.route("/login", methods=['GET', 'POST'])
+@cross_origin()
 def login():
-    # if current_user.is_authenticated:  # sprawdzamy czy jest już zalogowany
-    #     return
 
     login = request.json['login']
     haslo = request.json['haslo']
@@ -148,6 +132,13 @@ def login():
     session["user_id"] = user.id
 
     return user_schema.jsonify(user)
+
+@users_app.route("/logout", methods=['POST'])
+@cross_origin()
+def logout():
+    session.pop("user_id")
+
+    return "200"
 
 if __name__ == '__main__':
     # with users_app.app_context():

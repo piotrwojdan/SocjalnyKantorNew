@@ -26,8 +26,9 @@ const Konto = () => {
     <div className="content-section">
       {user != 0 ? (
         <div>
-          <h1>Zalogowano!!!</h1>
+          <h1>Zalogowano</h1>
           <h3>Login: {user.login}</h3>
+          <h3>Imię i nazwisko: {user.imie} {user.nazwisko}</h3>
         </div>
       ) :
         <fieldset className="form-group">
