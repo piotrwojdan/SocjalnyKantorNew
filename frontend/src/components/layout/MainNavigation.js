@@ -1,69 +1,74 @@
 import { Link } from 'react-router-dom'
-//importujemy ten kompponent link zamiast robić anchor tag w html
-//bo tak jest efektywniej bo nie trzeba wysyłac zapytań do serwera po kliknięciu w link
-//tylko react załodowuje komponent tej strony i wten sposób jest chyba szybciej
-
+import httpClient from "../httpClient"
 import classes from './MainNavigation.module.css'
 import React from 'react'
-//ten css działą tylko dla tego folderu
-//importujemy klasy cssowe dlatego potem classname = {} a nie 'coś'
-function MainNavigation() {
+import { useEffect, useState } from "react"
 
-  const token = sessionStorage.getItem("token")
-  const isLoggedIn = token !== null
 
-  if (isLoggedIn) {
-    return (
-      <header className={classes.header}>
-        <div className={classes.logo}>Socjalny Kantor</div>
-        <nav>
-          <ul>
-            <li>
-              <Link to='/'>Posty</Link>
-            </li>
+function MainNavigation(){
+
+  const logoutUser = async () => {
+    const resp = await httpClient.post('http://localhost:5002/logout')
+    window.location.href = "/";
+  }
+
+  const [isLogged, setIsLogged] = useState(true)
+
+  //sprawdzenie czy jest zalogowany jeśli tak to wyswietlamy co innego w navbarze
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       const resp = await httpClient.get('http://localhost:5002/@me')
+  //     } catch (err) {
+  //        if (err.response.status === 401){
+  //          setIsLogged(false)
+  //        }
+  //     }
+  //   })();
+  // });
+
+  return(
+    <header className={classes.header}>
+      <div className={classes.logo}>Socjalny Kantor</div>
+      <nav>
+        <ul>
+          <li>
+            <Link to='/'>Posty</Link>
+          </li>
+          {isLogged &&
             <li>
               <Link to='/dodajpost'>Dodaj post</Link>
             </li>
+          }
+          <li>
+            <Link to="/exchange">Wymiana walut</Link>
+          </li>
+          <li>
+            <Link to="/about">O nas</Link>
+          </li>
+          {isLogged &&
             <li>
-              <Link to="/exchange">Wymiana walut</Link>
+              <Link to="/konto">Konto</Link>
             </li>
-            <li>
-              <Link to="/about">O nas</Link>
-            </li>
-            <li>
-              <Link to="/account">Konto</Link>
-            </li>
-            <li>
-              <Link to="/logout">Wyloguj</Link>
-            </li>
-
-          </ul>
-        </nav>
-      </header>
-    )
-  } else {
-    return (
-      <header className={classes.header}>
-        <div className={classes.logo}>Socjalny Kantor</div>
-        <nav>
-          <ul>
-            <li>
-              <Link to='/'>Posty</Link>
-            </li>
-            <li>
-              <Link to="/about">O nas</Link>
-            </li>
+          }
+          {isLogged &&
             <li>
               <Link to="/login">Zaloguj się</Link>
             </li>
+          }
+          {isLogged &&
             <li>
-              <Link to="/signup">Rejestracja</Link>
+              <Link to="/register">Rejestracja</Link>
             </li>
-          </ul>
-        </nav>
-      </header>
-    )
-  }
+          }
+          {isLogged &&
+            <li>
+            <button className={classes.baton} onClick={logoutUser}>Wyloguj</button>
+          </li>}
+        </ul>
+      </nav>
+    </header>
+    );
 }
 
 export default MainNavigation;

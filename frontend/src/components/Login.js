@@ -1,59 +1,53 @@
 import React, { useState } from "react";
+import axios from "axios";
+
+
+const axio = axios.create({
+  withCredentials: true,
+});
 
 const Login = () => {
   const [login, setLogin] = useState("");
   const [haslo, setHaslo] = useState("");
 
-  const token = sessionStorage.getItem("token");
-  console.log("Twoj token " + token);
-
-  const handleClick = () => {
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        login: login,
-        haslo: haslo,
-      }),
-    };
-    fetch("http://127.0.0.1:5002/token", options)
-      .then((resp) => {
-        if (resp.status === 200) return resp.json();
-        else alert("Jakis blad");
-      })
-      .then((data) => {
-        console.log("backend -> ", data);
-        sessionStorage.setItem("token", data.access_token);
-        // sessionStorage.setItem("id", )
-      })
-      .catch((err) => {
-        console.error("Blad", err);
-      });
-  };
+  const logInUser = async () => {
+    try {
+        const resp = await axio.post('http://localhost:5002/login', { login, haslo})
+        console.log(resp.data);
+        window.location.href = "/konto"
+    } catch (err) {
+       if (err.response.status === 401){
+           alert("Invalid credentials");
+       }
+    }
+};
 
   return (
-    <div className="content-section">
-      <h1>Zaloguj się</h1>
-
-      {token && token != "" && token != undefined ? (
-        "Jestes zalogowany tokenem " + token
-      ) : (
+    <div>
+      <h1>Zaloguj się do konta</h1>
+      <form>
         <div>
+          <label>Login: </label>
           <input
             type="text"
             value={login}
             onChange={(e) => setLogin(e.target.value)}
+            id="login"
           />
+        </div>
+        <div>
+          <label>Hasło: </label>
           <input
             type="password"
             value={haslo}
             onChange={(e) => setHaslo(e.target.value)}
+            id="password"
           />
-          <button onClick={handleClick}>Potwierdź</button>
         </div>
-      )}
+        <button type="button" onClick={() => logInUser()}>
+          Zaloguj
+        </button>
+      </form>
     </div>
   );
 };

@@ -21,7 +21,7 @@ function DodajPostForm(props) {
       tytul: enteredTytul,
       tresc: enteredTresc
     }
-    console.log(meetupData)
+    // console.log(meetupData)
 
     props.onAddMeetup(meetupData)
   }

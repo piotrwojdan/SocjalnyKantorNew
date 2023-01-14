@@ -9,8 +9,10 @@ import EdytujPostForm from "./components/posty/EdytujPostForm";
 import WymianaWalut from "./pages/WymianaWalut";
 import Summary from "./components/waluty/Summary";
 import Login from "./components/Login";
-import Logout from "./components/Logout";
-import Test from "./components/Test"
+import Konto from "./components/Konto";
+import Register from "./components/Register"
+import NotFound from "./pages/NotFound"
+import PotwierdzenieUsuniecia from "./pages/PotwierdzenieUsuniecia"
 
 function App() {
   const [posts, setPosts] = useState([]);
@@ -39,9 +41,11 @@ function App() {
         <Route path="/edytujpost/:id" element={<EdytujPostForm />} />
         <Route path="/exchange" element={<WymianaWalut />} />
         <Route path="/exchange/summary" element={<Summary />} />
+        <Route path="/konto" element={<Konto />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/logout" element={<Logout />} />
-        <Route path="/account" element={<Test />} />
+        <Route path="/register" element={<Register />} />
+
+        <Route component={NotFound}/>
       </Routes>
     </Layout>
   );
