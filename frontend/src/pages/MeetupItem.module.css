@@ -1,0 +1,43 @@
+.item {
+  margin: 1rem 0;
+}
+
+.content {
+  text-align: center;
+  padding: 2rem;
+}
+
+.content h3 {
+  font-size: 1.9rem;
+  color: #2c292b;
+}
+
+h4 {
+  font-size: 1rem;
+  color: #2c292b;
+}
+
+p {
+  font-size: 1.5rem;
+}
+.actions {
+  padding: 20px;
+  text-align: center;
+  justify-content: space-between;
+  display: flex;
+}
+
+.actions button {
+  font: inherit;
+  cursor: pointer;
+  color: #59a8de;
+  border: 1px solid #3e7da9;
+  background-color: transparent;
+  padding: 0.5rem 1.5rem;
+  border-radius: 15px;
+}
+
+.actions button:hover,
+.actions button:active {
+  background-color: #ffe2ed;
+}
