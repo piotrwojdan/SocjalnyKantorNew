@@ -23,11 +23,12 @@ function AccountForm(props) {
     }
 
     useEffect(() => {
-        fetch("http://127.0.0.1:5003/accounts", {
+        fetch("http://127.0.0.1:5003/accounts/get", {
             'method': 'GET',
             'headers': {
                 'Content-Type': 'application/json'
-            }
+            },
+            body: JSON.stringify({user_id: props.user_id})
         })
             .then(resp => resp.json())
             .then(resp => setAccounts(resp))

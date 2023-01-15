@@ -34,16 +34,12 @@ class Post(posts_db.Model):
     dataUtworzenia = posts_db.Column(posts_db.DateTime, nullable=False, default=datetime.now())
     tresc = posts_db.Column(posts_db.Text, nullable=False)
     status = posts_db.Column(posts_db.String(10), default=StatusPostu.NOWY.value)
-    client_id = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("klient.id"), nullable=True) # user.id z małej bo odwołujemy się do tablicy
-    admin_id = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("admin.id"), nullable=True) # user.id z małej bo odwołujemy się do tablicy
-    
-    @hybrid_property
-    def author_id(self):
-        return self.client_id or self.admin_id
+    user_id = posts_db.Column(posts_db.Integer, nullable=False) # to zamiast calej tabeli
 
-    def __init__(self, tytul, tresc):
+    def __init__(self, tytul, tresc, user):
         self.tytul = tytul
         self.tresc = tresc
+        self.user_id = user
 
     def __repr__(self):
         return f"Post {self.tytul}, {self.dataUtworzenia}, {self.tresc}"
@@ -66,35 +62,35 @@ class EdycjePostu(posts_db.Model):
         self.zawartosc = zawartosc
     
 
-class Klient(posts_db.Model):
-    id = posts_db.Column(posts_db.Integer, primary_key=True)
-    imie = posts_db.Column(posts_db.String(20), nullable=False)
-    nazwisko = posts_db.Column(posts_db.String(20), nullable=False)
-    posts = posts_db.relationship('Post', lazy=True)    #relacja
+# class Klient(posts_db.Model):
+#     id = posts_db.Column(posts_db.Integer, primary_key=True)
+#     imie = posts_db.Column(posts_db.String(20), nullable=False)
+#     nazwisko = posts_db.Column(posts_db.String(20), nullable=False)
+#     posts = posts_db.relationship('Post', lazy=True)    #relacja
 
 
-    def __init__(self, id, imie, nazwisko):
-        self.id = id
-        self.imie = imie
-        self.nazwisko = nazwisko
+#     def __init__(self, id, imie, nazwisko):
+#         self.id = id
+#         self.imie = imie
+#         self.nazwisko = nazwisko
 
-    def __repr__(self):
-        return f"Użytkownik {self.imie}, {self.login}"
+#     def __repr__(self):
+#         return f"Użytkownik {self.imie}, {self.login}"
         
 
-class Admin(posts_db.Model): #
+# class Admin(posts_db.Model): #
 
-    id = posts_db.Column(posts_db.Integer, primary_key=True)
-    imie = posts_db.Column(posts_db.String(20), nullable=False)
-    nawzisko = posts_db.Column(posts_db.String(20), nullable=False)
-    posts = posts_db.relationship('Post', lazy=True)    #relacja
+#     id = posts_db.Column(posts_db.Integer, primary_key=True)
+#     imie = posts_db.Column(posts_db.String(20), nullable=False)
+#     nawzisko = posts_db.Column(posts_db.String(20), nullable=False)
+#     posts = posts_db.relationship('Post', lazy=True)    #relacja
 
-    def __init__(self, imie, nazwisko):
-        self.imie = imie
-        self.nazwisko = nazwisko
+#     def __init__(self, imie, nazwisko):
+#         self.imie = imie
+#         self.nazwisko = nazwisko
 
-    def __repr__(self):
-        return f"Użytkownik {self.imie}, {self.login}"
+#     def __repr__(self):
+#         return f"Użytkownik {self.imie}, {self.login}"
 
 
 
@@ -106,13 +102,6 @@ class postSchema(posts_ma.Schema):
 post_schema = postSchema()
 posts_schema = postSchema(many=True)
 
-
-class userSchema(posts_ma.Schema):
-    class Meta:
-        fields = ('id', 'imie', 'nazwisko')
-
-user_schema = userSchema()
-users_schema = userSchema(many=True)
 
 @posts_app.route('/get', methods=['GET'])
 @cross_origin()
@@ -144,6 +133,7 @@ def editPost(id):
 
     updatedTresc = request.json['tresc']
     updatedTytul = request.json['tytul']
+    admin_id = request.json['user'] 
 
     # edycja = EdycjePostu(post.tresc, id, 0)  # tu potem zamiast 0 bedzie id zalogowanego uzytkownika
     post.tresc = updatedTresc
@@ -166,20 +156,6 @@ def deletePost(id):
     posts_db.session.commit()
 
     return post_schema.jsonify(post)
-
-
-# @posts_app.route('/user/add', methods=['POST'])
-# def addUser():
-#     id = request.json['id']
-#     imie = request.json['imie']
-#     nazwisko = request.json['nazwisko']
-#
-#     user = Klient(id, imie, nazwisko)
-#
-#     posts_db.session.add(user)
-#     posts_db.session.commit()
-#
-#     return user_schema.jsonify(user)
 
 
 if __name__ == '__main__':

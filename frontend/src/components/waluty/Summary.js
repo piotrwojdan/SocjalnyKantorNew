@@ -11,8 +11,12 @@ function Summary() {
     const transactionData = location.state
 
     function sumbitHandler(event) {
-        // tu potrzebuje zapis do bazy 
-        // i jakis modal ze sukces operacji
+        event.preventDefault(); //zapobiegamy wysyłaniu żadania przez przeglądarkę
+
+        const newTransactionData = [
+            ...transactionData,
+            
+        ]
 
     }
 
@@ -34,7 +38,7 @@ function Summary() {
                                 </div>
                             </div>
                             <div className="col-sm">
-                                <label id="waluta">{transactionData.waluta}</label>
+                                <label id="waluta">{transactionData.waluta_name}</label>
                             </div>
                         </div>
                         <div className="row">
@@ -92,7 +96,7 @@ function Summary() {
                     </div>
                 </div>
 
-                <PaymentForm payment={payment} submitHandler={sumbitHandler}/>
+                <PaymentForm payment={payment} user={transactionData.klient} submitHandler={sumbitHandler}/>
             </LargeCard>
         </>
     )

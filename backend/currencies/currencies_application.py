@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS, cross_origin
+import random
 
 currencies_app = Flask(__name__)
 
@@ -16,7 +17,6 @@ currencies_db = SQLAlchemy(currencies_app)
 currencies_ma = Marshmallow(currencies_app)
 
 
-
 class CurrencySchema(currencies_ma.Schema):
     class Meta:
         fields = ('id', 'symbol', 'nazwa')
@@ -25,33 +25,29 @@ class CurrencySchema(currencies_ma.Schema):
 currency_schema = CurrencySchema()
 currencies_schema = CurrencySchema(many=True)
 
-class userSchema(currencies_ma.Schema):
-    class Meta:
-        fields = ('id', 'imie', 'nazwisko')
-
-user_schema = userSchema()
-users_schema = userSchema(many=True)
 
 class transactionSchema(currencies_ma.Schema):
     class Meta:
         fields = ('id', 'ilosc', 'cenaJedn', 'cena', 'nrKarty', 'idRachunku')
 
+
 transaction_schema = transactionSchema()
 transactions_schema = transactionSchema(many=True)
+
 
 class rachunekSchema(currencies_ma.Schema):
     class Meta:
         fields = ('id', 'numer', 'saldo', 'idKlienta')
 
+
 rachunek_schema = rachunekSchema()
 rachunki_schema = rachunekSchema(many=True)
+
 
 class Waluta(currencies_db.Model):
     id = currencies_db.Column(currencies_db.Integer, primary_key=True)
     symbol = currencies_db.Column(currencies_db.String(5), nullable=False)
     nazwa = currencies_db.Column(currencies_db.String(30), nullable=False)
-    # cena = currencies_db.Column(currencies_db.Float, nullable=False)
-    # dataAktualizacjiCeny = currencies_db.Column(currencies_db.DateTime, nullable=False)
 
     def __init__(self, symbol, nazwa):
         self.symbol = symbol
@@ -64,41 +60,41 @@ class Transakcja(currencies_db.Model):
     cenaJednostkowa = currencies_db.Column(currencies_db.Float, nullable=False)
     cenaCalkowita = currencies_db.Column(currencies_db.Float, nullable=False)
     numerKarty = currencies_db.Column(currencies_db.String(40), nullable=False)
-    # dataUtworzenia = currencies_db.Column(currencies_db.DateTime, nullable=False)
-    # dataZakonczenia = currencies_db.Column(currencies_db.DateTime, nullable=False)
-    walutaId = currencies_db.Column(currencies_db.Integer, currencies_db.ForeignKey("waluta.id"), nullable=False)
-    klientId = currencies_db.Column(currencies_db.Integer, currencies_db.ForeignKey("klient.id"), nullable=False)
-    rachunekId = currencies_db.Column(currencies_db.Integer, currencies_db.ForeignKey("rachunek.id"), nullable=False)
+    dataUtworzenia = currencies_db.Column(
+        currencies_db.DateTime, nullable=False)
+    dataZakonczenia = currencies_db.Column(
+        currencies_db.DateTime, nullable=False)
+    walutaId = currencies_db.Column(
+        currencies_db.Integer, currencies_db.ForeignKey("waluta.id"), nullable=False)
+    klientId = currencies_db.Column(currencies_db.Integer, nullable=False)
+    rachunekId = currencies_db.Column(
+        currencies_db.Integer, currencies_db.ForeignKey("rachunek.id"), nullable=False)
 
-    def __init__(self, ilosc, waluta_id, cena_jednostkowa):
+    def __init__(self, ilosc, waluta_id, cena_jednostkowa, cenaCalkowita, dataUtworzenia, dataZakonczenia, user_id, rachunek_id, numer_karty):
         self.ilosc = ilosc
         self.walutaId = waluta_id
         self.cenaJednostkowa = cena_jednostkowa
-        self.cenaCalkowita = cena_jednostkowa * ilosc
+        self.cenaCalkowita = cenaCalkowita
+        self.dataUtworzenia = dataUtworzenia
+        self.dataZakonczenia = dataZakonczenia
+        self.klientId = user_id
+        self.rachunekId = rachunek_id
+        self.numerKarty = numer_karty
 
 
 class Rachunek(currencies_db.Model):
     id = currencies_db.Column(currencies_db.Integer, primary_key=True)
     numer = currencies_db.Column(currencies_db.Integer, nullable=False)
-    saldo = currencies_db.Column(currencies_db.Integer, nullable=False)
-    walutaId = currencies_db.Column(currencies_db.Integer, currencies_db.ForeignKey("waluta.id"), nullable=False)
-    klientId = currencies_db.Column(currencies_db.Integer, currencies_db.ForeignKey("klient.id"), nullable=False)
+    saldo = currencies_db.Column(currencies_db.Float, nullable=False)
+    walutaId = currencies_db.Column(
+        currencies_db.Integer, currencies_db.ForeignKey("waluta.id"), nullable=False)
+    klientId = currencies_db.Column(currencies_db.Integer, nullable=False)
 
-    def __init__(self, numer, waluta, klient):
+    def __init__(self, numer, waluta, klient, saldo=0):
         self.numer = numer
-        self.saldo = 0
+        self.saldo = saldo
         self.walutaId = waluta
         self.klientId = klient
-
-
-class Klient(currencies_db.Model):
-    id = currencies_db.Column(currencies_db.Integer, primary_key=True)
-    imie = currencies_db.Column(currencies_db.String(20), nullable=False)
-    nazwisko = currencies_db.Column(currencies_db.String(20), nullable=False)
-
-    def __init__(self, imie, nazwisko):
-        self.imie = imie
-        self.nazwisko = nazwisko
 
 
 @currencies_app.route('/currency/get', methods=['GET'])
@@ -106,6 +102,7 @@ def get_currencies():
     all_currencies = Waluta.query.all()
     results = currencies_schema.dump(all_currencies)
     return jsonify(results)
+
 
 @currencies_app.route('/currency/add', methods=['POST'])
 def add_currency():
@@ -119,29 +116,67 @@ def add_currency():
 
     return currency_schema.jsonify(waluta)
 
+
 @currencies_app.route('/transaction/add', methods=['POST'])
 def add_transaction():
     ilosc = request.json['ilosc']
     cenaJednostkowa = request.json['cenaJedn']
+    cenaCalkowita = request.json['cenaCalk']
     numerKarty = request.json['nrKarty']
-    # dataUtworzenia = currencies_db.Column(currencies_db.DateTime, nullable=False)
-    # dataZakonczenia = currencies_db.Column(currencies_db.DateTime, nullable=False)
+    dataUtworzenia = request.json['dataU']
+    dataZakonczenia = request.json['dataZ']
     walutaId = request.json['waluta']
     klientId = request.json['klient']
     rachunekId = request.json['idRachunku']
 
-    transakcja = Transakcja(ilosc, walutaId, cenaJednostkowa, klientId, )
+    transakcja = Transakcja(ilosc, walutaId, cenaJednostkowa, cenaCalkowita, dataUtworzenia,
+                            dataZakonczenia, klientId, rachunekId, numerKarty)
+
+    rachunek_docelowy = Rachunek.query.filter_by(
+        klientId=klientId, walutaId=walutaId).first()
+
+    if not rachunek_docelowy:
+        numerRachunku = random.randint(
+            int(walutaId)*1000000, int(walutaId)*10000000)
+
+        while Rachunek.query.filter_by(numer=numerRachunku).first():
+            numerRachunku = random.randint(
+                int(walutaId)*1000000, int(walutaId)*10000000)
+
+        rachunek_docelowy = Rachunek(
+            numerRachunku, walutaId, klientId, float(ilosc))
+        currencies_db.session.add(rachunek_docelowy)
+    else:
+        rachunek_docelowy.saldo += float(ilosc)
+
+    if rachunekId:
+        oplacono_z = Rachunek.query.get(rachunekId)
+        oplacono_z.saldo -= cenaCalkowita
 
     currencies_db.session.add(transakcja)
     currencies_db.session.commit()
 
     return transaction_schema.jsonify(transakcja)
 
+
 @currencies_app.route('/transaction/get', methods=['GET'])
 def get_transactions():
-    all_currencies = Waluta.query.all()
-    results = transactions_schema.dump(all_currencies)
+    user_id = request.json['user_id']
+# to nam zwraca transakcje danego uzytkownika
+    transakcje = Transakcja.query.filter_by(klientId=user_id).all()
+
+    results = transactions_schema.jsonify(transakcje)
     return jsonify(results)
+
+@currencies_app.route('/accounts/get', methods=['GET'])
+def get_accounts_user():
+    user_id = request.json['user_id']
+# to nam zwraca rachunki danego uzytkownika
+    rachunki = Rachunek.query.filter_by(klientId=user_id).all()
+
+    results = rachunki_schema.jsonify(rachunki)
+    return jsonify(results)
+
 
 @currencies_app.route('/rachunek/add', methods=['POST'])
 def add_rachunek():
@@ -155,19 +190,6 @@ def add_rachunek():
     currencies_db.session.commit()
 
     return rachunek_schema.jsonify(rachunek)
-
-# @currencies_app.route('/user/add', methods=['POST'])
-# def addUser():
-#     id = request.json['id']
-#     imie = request.json['imie']
-#     nazwisko = request.json['nazwisko']
-#
-#     user = Klient(id, imie, nazwisko)
-#
-#     currencies_db.session.add(user)
-#     currencies_db.session.commit()
-#
-#     return user_schema.jsonify(user)
 
 
 if __name__ == '__main__':
