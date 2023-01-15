@@ -7,7 +7,6 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 from flask_login import current_user
 from flask_cors import CORS, cross_origin
 from flask_bcrypt import Bcrypt
-import requests, json
 import redis
 from flask_session import Session
 
@@ -43,12 +42,13 @@ class User(users_db.Model):
     id = users_db.Column(users_db.Integer, primary_key=True)
     imie = users_db.Column(users_db.String(20), nullable=False)
     nazwisko = users_db.Column(users_db.String(20), nullable=False)
-    login = users_db.Column(users_db.String(100), unique=True, nullable=False) #login to email
+    login = users_db.Column(users_db.String(
+        100), unique=True, nullable=False)  # login to email
     haslo = users_db.Column(users_db.String(60), nullable=False)
     dataUrodzenia = users_db.Column(users_db.Date, nullable=False)
     czyAdmin = users_db.Column(users_db.Boolean, nullable=False, default=False)
     # posts = users_db.relationship('Post', backref='author', lazy=True)    #relacja
-    #rachunki = db.relationship('Rachunek', backref='author', lazy=True)
+    # rachunki = db.relationship('Rachunek', backref='author', lazy=True)
 
     # @login_manager.user_loader
     # def load_user(user_id):
@@ -64,15 +64,17 @@ class User(users_db.Model):
 
     def __repr__(self):
         return f"Użytkownik {self.imie}, {self.login}"
-        
+
 
 # this is for jsonification of our user objects
 class UserSchema(users_ma.Schema):
     class Meta:
         fields = ('id', 'imie', 'nazwisko', 'login', 'haslo', 'dataUrodzenia')
 
+
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
+
 
 @users_app.route("/@me")
 @cross_origin()
@@ -86,26 +88,24 @@ def get_current_user():
     return user_schema.jsonify(user)
 
 
-@users_app.route("/register", methods=['POST'])
+@users_app.route("/register", methods=['POST', 'OPTIONS'])
 @cross_origin()
 def register():
+
     imie = request.json['imie']
     nazwisko = request.json['nazwisko']
     login = request.json['login']
     haslo = request.json['haslo']
-    dataUrodzenia = datetime.strptime(request.json['dataUrodzenia'], "%d.%m.%Y")
+    dataUrodzenia = datetime.strptime(
+        request.json['dataUrodzenia'], "%d.%m.%Y")
 
     user_exists = User.query.filter_by(login=login).first() is not None
 
     if user_exists:
         return jsonify({"error": "Użytkownik już istnieje"}), 409
 
-    new_user = User(imie=imie, nazwisko=nazwisko, login=login, haslo=haslo, dataUrodzenia=dataUrodzenia)
-
-    # to jest po to zeby sie uzytkownicy tez dodawali w pozostalych czesciach aplikacji
-    # to_send = {'id': f'{new_user.id}', 'imie': imie, 'nazwisko': nazwisko}
-    # requests.post(POSTS_URL + "user/add", json=to_send)
-    # requests.post(CURRENCIES_URL + "user/add", json=to_send)
+    new_user = User(imie=imie, nazwisko=nazwisko, login=login,
+                    haslo=haslo, dataUrodzenia=dataUrodzenia)
 
     users_db.session.add(new_user)
     users_db.session.commit()
@@ -134,6 +134,7 @@ def login():
 
     return user_schema.jsonify(user)
 
+
 @users_app.route("/logout", methods=['POST'])
 @cross_origin()
 def logout():
@@ -141,10 +142,12 @@ def logout():
 
     return "200"
 
+
 @users_app.after_request
 def after_each(response):
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
+
 
 if __name__ == '__main__':
     # with users_app.app_context():
