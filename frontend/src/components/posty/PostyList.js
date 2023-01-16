@@ -23,7 +23,7 @@ function PostyList(props) {
     (async () => {
       try {
         const resp = await axio.get('http://localhost:5002/@me')
-        console.log(resp.data['czyAdmin'])
+        // console.log(resp.data['czyAdmin'])
         setCurrUser(resp.data['id'])
         setCzyAdmin(resp.data["czyAdmin"])
       } catch (err) {

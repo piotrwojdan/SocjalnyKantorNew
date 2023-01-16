@@ -3,8 +3,26 @@ import Card from "../ui/Card"
 import classes from "./NowyPost.module.css"
 import {useState, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
+import axios from "axios";
+
+const axio = axios.create({
+  withCredentials: true,
+});
 
 function EdytujPostForm(props) {
+  const [currUser, setCurrUser] = useState(0)
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const resp = await axio.get('http://localhost:5002/@me')
+        setCurrUser(resp.data.id)
+        console.log("Current user  " + currUser)
+      } catch (err) {
+        console.log("Not authenticated")
+      }
+    })();
+  }, []);
 
   const { id } = useParams() //pobierze ze ścieżki
 
@@ -44,7 +62,7 @@ function EdytujPostForm(props) {
         'Accept': 'application/json, text/plain, */*',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({tytul: tytul, tresc: tresc})
+      body: JSON.stringify({tytul: tytul, tresc: tresc, autor: currUser})
     }).then(res => res.json())
       .then(res => console.log(res))
       .then(() => {window.location.reload(false)})

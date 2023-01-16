@@ -67,9 +67,6 @@ class EdycjePostu(posts_db.Model):
         self.post = post_id
         self.edytujacy = edytujacy
 
-
-    def __init__(self, zawartosc):
-        self.zawartosc = zawartosc
     
 
 class Klient(posts_db.Model):
@@ -155,8 +152,9 @@ def editPost(id):
 
     updatedTresc = request.json['tresc']
     updatedTytul = request.json['tytul']
+    autor = request.json['autor']
 
-    # edycja = EdycjePostu(post.tresc, id, 0)  # tu potem zamiast 0 bedzie id zalogowanego uzytkownika
+    edycja = EdycjePostu(zawartosc=post.tresc, post_id=id, edytujacy=autor)  # tu potem zamiast 0 bedzie id zalogowanego uzytkownika
     post.tresc = updatedTresc
     post.tytul = updatedTytul
     post.dataUtworzenia = datetime.now()
