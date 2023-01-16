@@ -27,18 +27,24 @@ class StatusPostu(Enum):
     USUNIETY = "usuniety"
 
 
+# creating model for the orm to communicate with the db
 class Post(posts_db.Model):
     id = posts_db.Column(posts_db.Integer, primary_key=True)
     tytul = posts_db.Column(posts_db.String(150), nullable=False)
     dataUtworzenia = posts_db.Column(posts_db.DateTime, nullable=False, default=datetime.now())
     tresc = posts_db.Column(posts_db.Text, nullable=False)
     status = posts_db.Column(posts_db.String(10), default=StatusPostu.NOWY.value)
-    client_id = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("klient.id"), nullable=True)
+    client_id = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("klient.id"), nullable=True) # user.id z małej bo odwołujemy się do tablicy
+    # client_id = posts_db.Column(posts_db.Integer,nullable=True) # user.id z małej bo odwołujemy się do tablicy
     admin_id = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("admin.id"), nullable=True)
     
     @hybrid_property
     def author_id(self):
         return self.client_id or self.admin_id
+
+    # def __init__(self, tytul, tresc):
+    #     self.tytul = tytul
+    #     self.tresc = tresc
 
     def __init__(self, tytul, tresc, client_id):
         self.tytul = tytul
@@ -87,7 +93,7 @@ class Admin(posts_db.Model): #
     id = posts_db.Column(posts_db.Integer, primary_key=True)
     imie = posts_db.Column(posts_db.String(20), nullable=False)
     nawzisko = posts_db.Column(posts_db.String(20), nullable=False)
-    posts = posts_db.relationship('Post', lazy=True)
+    posts = posts_db.relationship('Post', lazy=True)    #relacja
 
     def __init__(self, imie, nazwisko):
         self.imie = imie
@@ -97,9 +103,11 @@ class Admin(posts_db.Model): #
         return f"Użytkownik {self.imie}, {self.login}"
 
 
+
+# this is for jsonification of our post objects
 class postSchema(posts_ma.Schema):
     class Meta:
-        fields = ('id', 'tytul', 'status', 'dataUtworzenia', 'tresc', 'autor')
+        fields = ('id', 'tytul', 'status', 'dataUtworzenia', 'tresc', 'client_id', 'admin_id')
 
 post_schema = postSchema()
 posts_schema = postSchema(many=True)
@@ -116,7 +124,11 @@ users_schema = userSchema(many=True)
 @cross_origin()
 def getPosts():
     posts = Post.query.all()
+
+    # for post in posts:
+    #     print("Post " + post.tytul + " user_id " + str(post.client_id))
     results = posts_schema.dump(posts)
+
     return jsonify(results)
 
 @posts_app.route('/get/<id>', methods=['GET'])
@@ -128,9 +140,10 @@ def getPostDetails(id):
 def addPost():
     tytul = request.json['tytul']
     tresc = request.json['tresc']
-    user = request.json['user']
+    autor = request.json['autor']
 
-    post = Post(tytul, tresc, user)
+    post = Post(tytul, tresc, autor)
+    # print(post.dataUtworzenia)
     posts_db.session.add(post)
     posts_db.session.commit()
 
