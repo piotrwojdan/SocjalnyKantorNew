@@ -1,6 +1,7 @@
 import classes from "./MeetupList.module.css"
 import classes2 from "./MeetupItem.module.css"
 import { useNavigate, Routes, Route, useParams } from "react-router-dom"
+import FlashMessage from "react-flash-message";
 import Card from "../ui/Card"
 import React from "react"
 import Moment from 'moment';
@@ -20,6 +21,7 @@ function PostyList(props) {
 
   const usunPost = (post) => {
     console.log(post.id)
+    // post.preventDefault();
 
     return fetch(`http://127.0.0.1:5001/delete/${post.id}`, {
       method: "DELETE",
@@ -27,6 +29,7 @@ function PostyList(props) {
         "Content-Type": "application/json",
       },
     }).then(() => {window.location.reload(false)})
+      .then(() => {props.flashFun()})
   }
 
   const editPost = (post) => {
@@ -41,7 +44,7 @@ function PostyList(props) {
   return (
 
     <ul className={classes.list}>
-      {/*reverse()*/}
+
       {props.posty.map((post) => {
 
         if (post.status != "usuniety"){
@@ -55,8 +58,8 @@ function PostyList(props) {
 
               <div className={classes2.actions}>
                 {/*sprawdzenie id tego użytkownika*/}
-                {/*<button onClick={() => usunPost(post)}>Usuń</button>*/}
-                <button onClick={() => PotwierdzenieUsuniecia(post = post)}>Usuń</button>
+                <button onClick={() => usunPost(post)}>Usuń</button>
+                {/*<button onClick={() => PotwierdzenieUsuniecia(post = post)}>Usuń</button>*/}
                 <p> </p>
                 {/*<button onClick={() => editPost(post)}>Edytuj</button>*/}
                 <button onClick={() => navigateToEdit(post)}>Edytuj</button>

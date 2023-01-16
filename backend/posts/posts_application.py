@@ -27,23 +27,23 @@ class StatusPostu(Enum):
     USUNIETY = "usuniety"
 
 
-# creating model for the orm to communicate with the db
 class Post(posts_db.Model):
     id = posts_db.Column(posts_db.Integer, primary_key=True)
     tytul = posts_db.Column(posts_db.String(150), nullable=False)
     dataUtworzenia = posts_db.Column(posts_db.DateTime, nullable=False, default=datetime.now())
     tresc = posts_db.Column(posts_db.Text, nullable=False)
     status = posts_db.Column(posts_db.String(10), default=StatusPostu.NOWY.value)
-    client_id = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("klient.id"), nullable=True) # user.id z małej bo odwołujemy się do tablicy
-    admin_id = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("admin.id"), nullable=True) # user.id z małej bo odwołujemy się do tablicy
+    client_id = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("klient.id"), nullable=True)
+    admin_id = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("admin.id"), nullable=True)
     
     @hybrid_property
     def author_id(self):
         return self.client_id or self.admin_id
 
-    def __init__(self, tytul, tresc):
+    def __init__(self, tytul, tresc, client_id):
         self.tytul = tytul
         self.tresc = tresc
+        self.client_id = client_id
 
     def __repr__(self):
         return f"Post {self.tytul}, {self.dataUtworzenia}, {self.tresc}"
@@ -87,7 +87,7 @@ class Admin(posts_db.Model): #
     id = posts_db.Column(posts_db.Integer, primary_key=True)
     imie = posts_db.Column(posts_db.String(20), nullable=False)
     nawzisko = posts_db.Column(posts_db.String(20), nullable=False)
-    posts = posts_db.relationship('Post', lazy=True)    #relacja
+    posts = posts_db.relationship('Post', lazy=True)
 
     def __init__(self, imie, nazwisko):
         self.imie = imie
@@ -97,8 +97,6 @@ class Admin(posts_db.Model): #
         return f"Użytkownik {self.imie}, {self.login}"
 
 
-
-# this is for jsonification of our post objects
 class postSchema(posts_ma.Schema):
     class Meta:
         fields = ('id', 'tytul', 'status', 'dataUtworzenia', 'tresc', 'autor')
@@ -130,9 +128,9 @@ def getPostDetails(id):
 def addPost():
     tytul = request.json['tytul']
     tresc = request.json['tresc']
+    user = request.json['user']
 
-    post = Post(tytul, tresc)
-    print(post.dataUtworzenia)
+    post = Post(tytul, tresc, user)
     posts_db.session.add(post)
     posts_db.session.commit()
 
