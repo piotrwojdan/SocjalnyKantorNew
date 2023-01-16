@@ -138,7 +138,7 @@ function KupWaluteForm(props) {
                 return cur
             })))
             .catch(err => console.log(err))
-        
+        // setCurrencies(currencies.filter((cur) => {cur.nazwa !== 'USD-USD'}))
         first.current = true;
     }, []);
 
@@ -166,11 +166,12 @@ function KupWaluteForm(props) {
             ilosc: enteredilosc,
             cena: enteredCena,
             kurs: enteredKurs,
-            klient: user_id
+            klient: user_id,
+            data: new Date().toJSON()
         }
         console.log(transactionData)
 
-        props.onSubmitForm(transactionData)
+        props.onSubmitForm(transactionData, currencies)
     }
 
     const handleSelect = (e) => {

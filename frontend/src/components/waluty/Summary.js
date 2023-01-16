@@ -6,18 +6,31 @@ import { useState } from 'react'
 import PaymentForm from './PaymentForm';
 
 
-function Summary() {
-    const location = useLocation();
-    const transactionData = location.state
+function Summary(props) {
+    const transactionData = props.transactionData
+    console.log(transactionData)
+
+    const {waluta_name, waluta_id, ilosc, cena, kurs, klient, data} = transactionData
+    
 
     function sumbitHandler(event) {
-        event.preventDefault(); //zapobiegamy wysyłaniu żadania przez przeglądarkę
 
-        const newTransactionData = [
-            ...transactionData,
-            
-        ]
+        const {idRachunku, nrKarty} = event
 
+        const newTransactionData = {
+            ilosc: ilosc,
+            cenaJedn: kurs,
+            cenaCalk: cena,
+            dataU: data,
+            dataZ: new Date().toJSON(),
+            waluta: waluta_id,
+            klient: klient,
+            nrKarty: nrKarty,
+            idRachunku: idRachunku
+        }
+        console.log(newTransactionData)
+
+        props.addTransaction(newTransactionData)
     }
 
     const [payment, setPayment] = useState("")
@@ -38,7 +51,7 @@ function Summary() {
                                 </div>
                             </div>
                             <div className="col-sm">
-                                <label id="waluta">{transactionData.waluta_name}</label>
+                                <label id="waluta">{waluta_name}</label>
                             </div>
                         </div>
                         <div className="row">
@@ -48,7 +61,7 @@ function Summary() {
                                 </div>
                             </div>
                             <div className="col-sm">
-                                <label id="kurs">${transactionData.kurs}</label>
+                                <label id="kurs">${kurs}</label>
                             </div>
                         </div>
                         <div className="row">
@@ -58,7 +71,7 @@ function Summary() {
                                 </div>
                             </div>
                             <div className="col-sm">
-                                <label id="ilosc">{transactionData.ilosc}</label>
+                                <label id="ilosc">{ilosc}</label>
                             </div>
                         </div>
                         <div className="row">
@@ -68,7 +81,7 @@ function Summary() {
                                 </div>
                             </div>
                             <div className="col-sm">
-                                <label id="cena">${transactionData.cena}</label>
+                                <label id="cena">${cena.toFixed(2)}</label>
                             </div>
                         </div>
                     </div>

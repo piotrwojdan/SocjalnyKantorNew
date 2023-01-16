@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS, cross_origin
 import random
+from datetime import datetime
 
 currencies_app = Flask(__name__)
 
@@ -37,7 +38,7 @@ transactions_schema = transactionSchema(many=True)
 
 class rachunekSchema(currencies_ma.Schema):
     class Meta:
-        fields = ('id', 'numer', 'saldo', 'idKlienta')
+        fields = ('id', 'numer', 'saldo', 'walutaId','klientId')
 
 
 rachunek_schema = rachunekSchema()
@@ -71,9 +72,9 @@ class Transakcja(currencies_db.Model):
         currencies_db.Integer, currencies_db.ForeignKey("rachunek.id"), nullable=False)
 
     def __init__(self, ilosc, waluta_id, cena_jednostkowa, cenaCalkowita, dataUtworzenia, dataZakonczenia, user_id, rachunek_id, numer_karty):
-        self.ilosc = ilosc
+        self.ilosc = float(ilosc)
         self.walutaId = waluta_id
-        self.cenaJednostkowa = cena_jednostkowa
+        self.cenaJednostkowa = float(cena_jednostkowa)
         self.cenaCalkowita = cenaCalkowita
         self.dataUtworzenia = dataUtworzenia
         self.dataZakonczenia = dataZakonczenia
@@ -129,6 +130,9 @@ def add_transaction():
     klientId = request.json['klient']
     rachunekId = request.json['idRachunku']
 
+    dataUtworzenia = datetime.strptime(dataUtworzenia, '%Y-%m-%dT%H:%M:%S.%f%z')
+    dataZakonczenia = datetime.strptime(dataZakonczenia, '%Y-%m-%dT%H:%M:%S.%f%z')
+
     transakcja = Transakcja(ilosc, walutaId, cenaJednostkowa, cenaCalkowita, dataUtworzenia,
                             dataZakonczenia, klientId, rachunekId, numerKarty)
 
@@ -168,28 +172,38 @@ def get_transactions():
     results = transactions_schema.jsonify(transakcje)
     return jsonify(results)
 
-@currencies_app.route('/accounts/get', methods=['GET'])
+@currencies_app.route('/accounts/get', methods=['POST'])
+@cross_origin()
 def get_accounts_user():
-    user_id = request.json['user_id']
+    user_id = request.json['klient']
 # to nam zwraca rachunki danego uzytkownika
     rachunki = Rachunek.query.filter_by(klientId=user_id).all()
 
-    results = rachunki_schema.jsonify(rachunki)
+    results = rachunki_schema.dump(rachunki)
     return jsonify(results)
 
 
-@currencies_app.route('/rachunek/add', methods=['POST'])
+@currencies_app.route('/accounts/add', methods=['POST'])
 def add_rachunek():
-    numer = request.json['numer']
     walutaId = request.json['waluta']
     klientId = request.json['klient']
 
-    rachunek = Rachunek(numer, walutaId, klientId)
+    numerRachunku = random.randint(int(walutaId)*1000000, int(walutaId)*10000000)
+
+    while Rachunek.query.filter_by(numer=numerRachunku).first():
+        numerRachunku = random.randint(int(walutaId)*1000000, int(walutaId)*10000000)
+
+    rachunek = Rachunek(numerRachunku, walutaId, klientId)
 
     currencies_db.session.add(rachunek)
     currencies_db.session.commit()
 
     return rachunek_schema.jsonify(rachunek)
+
+@currencies_app.after_request
+def after_each(response):
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
 
 
 if __name__ == '__main__':

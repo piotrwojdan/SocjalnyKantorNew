@@ -3,6 +3,7 @@ import classes from './CardForm.module.css'
 import { useNavigate } from 'react-router-dom'
 import { usePaymentInputs } from 'react-payment-inputs'
 import { Form } from 'react-bootstrap'
+import valid from 'card-validator'
 
 
 
@@ -11,32 +12,44 @@ function CardForm(props) {
     const { meta, getCardNumberProps, getExpiryDateProps, getCVCProps } = usePaymentInputs();
 
     const { erroredInputs, touchedInputs } = meta;
+    const {cardNumber, setCardNumber} = useState("")
+
+    const inputCard = useRef();
 
     function submitHandler(event) {
         event.preventDefault();
+        console.log(inputCard.current.value)
 
         const moretransactionData = {
-            nrKarty: touchedInputs.cardNumber
+            nrKarty: inputCard.current.value
         }
         console.log(moretransactionData)
 
         props.onSubmitForm(moretransactionData)
     }
 
+    function handleCreditCard(e) {
+        const number = e.target.value
+        if (valid.number(number))
+            setCardNumber(number);
+    }
+
     return (
         <form className={classes.form} onSubmit={submitHandler}>
             <div className={classes.control}>
-                <Form.Label>Card number</Form.Label>
+                <Form.Label>Numer karty</Form.Label>
                 <Form.Control
-                    {...getCardNumberProps()}
-                    // ref={numberInputRef}
+                    value={cardNumber}
+                    onBlur={handleCreditCard}
+                    ref={inputCard}
+                    required
                     isInvalid={touchedInputs.cardNumber && erroredInputs.cardNumber}
                     placeholder="0000 0000 0000 0000"
                 />
                 <Form.Control.Feedback type="invalid">{erroredInputs.cardNumber}</Form.Control.Feedback>
             </div>
             <div className={classes.control}>
-                <Form.Label>Expiry date</Form.Label>
+                <Form.Label>Data wazności</Form.Label>
                 <Form.Control
                     {...getExpiryDateProps()}
                     isInvalid={touchedInputs.expiryDate && erroredInputs.expiryDate}
@@ -44,7 +57,7 @@ function CardForm(props) {
                 <Form.Control.Feedback type="invalid">{erroredInputs.expiryDate}</Form.Control.Feedback>
             </div>
             <div className={classes.control}>
-                <Form.Label>CVC</Form.Label>
+                <Form.Label>Kod CVC</Form.Label>
                 <Form.Control
                     {...getCVCProps()}
                     isInvalid={touchedInputs.cvc && erroredInputs.cvc}

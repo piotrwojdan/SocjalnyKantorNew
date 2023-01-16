@@ -7,12 +7,12 @@ import About from "./components/About";
 import Posty from "./pages/Posty";
 import EdytujPostForm from "./components/posty/EdytujPostForm";
 import WymianaWalut from "./pages/WymianaWalut";
-import Summary from "./components/waluty/Summary";
 import Login from "./components/Login";
 import Konto from "./components/Konto";
 import Register from "./components/Register"
 import NotFound from "./pages/NotFound"
 import PotwierdzenieUsuniecia from "./pages/PotwierdzenieUsuniecia"
+import PodsumowanieWaluty from "./pages/PodsumowanieWaluty";
 
 function App() {
   const [posts, setPosts] = useState([]);
@@ -40,7 +40,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/edytujpost/:id" element={<EdytujPostForm />} />
         <Route path="/exchange" element={<WymianaWalut />} />
-        <Route path="/exchange/summary" element={<Summary />} />
+        <Route path="/exchange/summary" element={<PodsumowanieWaluty />} />
         <Route path="/konto" element={<Konto />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
