@@ -20,8 +20,6 @@ users_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 users_app.config['SESSION_TYPE'] = 'redis'
 users_app.config['CORS_HEADERS'] = 'Content-Type'
 
-# POSTS_URL = 'http://localhost:5001/'
-# CURRENCIES_URL = 'http://localhost:5003/'
 
 users_db = SQLAlchemy(users_app)
 users_ma = Marshmallow(users_app)
@@ -47,14 +45,9 @@ class User(users_db.Model):
     haslo = users_db.Column(users_db.String(60), nullable=False)
     dataUrodzenia = users_db.Column(users_db.Date, nullable=False)
     czyAdmin = users_db.Column(users_db.Boolean, nullable=False, default=False)
-    # posts = users_db.relationship('Post', backref='author', lazy=True)    #relacja
-    #rachunki = db.relationship('Rachunek', backref='author', lazy=True)
 
-    # @login_manager.user_loader
-    # def load_user(user_id):
-    #     return Klient.query.get(int(user_id))  # był tu user
 
-    def __init__(self, imie, nazwisko, login, haslo, dataUrodzenia, czyAdmin=False):
+    def __init__(self, imie, nazwisko, login, haslo, dataUrodzenia, czyAdmin):
         self.imie = imie
         self.nazwisko = nazwisko
         self.login = login
@@ -69,7 +62,7 @@ class User(users_db.Model):
 # this is for jsonification of our user objects
 class UserSchema(users_ma.Schema):
     class Meta:
-        fields = ('id', 'imie', 'nazwisko', 'login', 'haslo', 'dataUrodzenia')
+        fields = ('id', 'imie', 'nazwisko', 'login', 'haslo', 'dataUrodzenia', 'czyAdmin')
 
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
@@ -83,6 +76,9 @@ def get_current_user():
         return jsonify({"error": "Unauthorized"}), 401
 
     user = User.query.filter_by(id=user_id).first()
+    print("Current user " + str(user_id))
+    users = User.query.all()
+
     return user_schema.jsonify(user)
 
 
@@ -94,18 +90,15 @@ def register():
     login = request.json['login']
     haslo = request.json['haslo']
     dataUrodzenia = datetime.strptime(request.json['dataUrodzenia'], "%d.%m.%Y")
+    czyAdmin = request.json['czyAdmin']
 
     user_exists = User.query.filter_by(login=login).first() is not None
 
     if user_exists:
         return jsonify({"error": "Użytkownik już istnieje"}), 409
 
-    new_user = User(imie=imie, nazwisko=nazwisko, login=login, haslo=haslo, dataUrodzenia=dataUrodzenia)
-
-    # to jest po to zeby sie uzytkownicy tez dodawali w pozostalych czesciach aplikacji
-    # to_send = {'id': f'{new_user.id}', 'imie': imie, 'nazwisko': nazwisko}
-    # requests.post(POSTS_URL + "user/add", json=to_send)
-    # requests.post(CURRENCIES_URL + "user/add", json=to_send)
+    new_user = User(imie=imie, nazwisko=nazwisko, login=login, haslo=haslo,
+                    dataUrodzenia=dataUrodzenia, czyAdmin=czyAdmin)
 
     users_db.session.add(new_user)
     users_db.session.commit()

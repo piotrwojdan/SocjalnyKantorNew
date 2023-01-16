@@ -5,14 +5,33 @@ import Card from "../ui/Card"
 import React from "react"
 import Moment from 'moment';
 import { useState } from "react"
-import PostItem from "./PostItem"
-import PotwierdzenieUsuniecia from "../../pages/PotwierdzenieUsuniecia"
+import axios from "axios";
+import { useEffect } from "react"
 
+const axio = axios.create({
+  withCredentials: true,
+});
 //mapujemy listę postów z props
 function PostyList(props) {
 
   const [editedPost, setEditedPost] = useState(null)
   const navigate = useNavigate();
+  const [currUser, setCurrUser] = useState(0)
+  const [czyAdmin, setCzyAdmin] = useState(false)
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const resp = await axio.get('http://localhost:5002/@me')
+        console.log(resp.data['czyAdmin'])
+        setCurrUser(resp.data['id'])
+        setCzyAdmin(resp.data["czyAdmin"])
+      } catch (err) {
+        console.log("Not authenticated")
+      }
+    })();
+  }, []);
+
 
   const navigateToEdit = (post) => {
     navigate(`/edytujpost/${post.id}`);
@@ -53,15 +72,24 @@ function PostyList(props) {
                 <p>{post.tresc}</p>
               </div>
 
-              <div className={classes2.actions}>
-                {/*sprawdzenie id tego użytkownika*/}
-                {/*<button onClick={() => usunPost(post)}>Usuń</button>*/}
-                <button onClick={() => PotwierdzenieUsuniecia(post = post)}>Usuń</button>
-                <p> </p>
-                {/*<button onClick={() => editPost(post)}>Edytuj</button>*/}
-                <button onClick={() => navigateToEdit(post)}>Edytuj</button>
 
-              </div>
+              {/*sprawdzenie id tego użytkownika*/}
+              {
+                (czyAdmin || currUser == post.client_id) &&
+                <div className={classes2.actions}>
+
+                  <button onClick={() => usunPost(post)}>Usuń</button>
+                  <p> </p>
+                  {/*<button onClick={() => editPost(post)}>Edytuj</button>*/}
+                  <button onClick={() => navigateToEdit(post)}>Edytuj</button>
+
+                </div>
+              }
+
+
+              {/*<button onClick={() => PotwierdzenieUsuniecia(post = post)}>Usuń</button>*/}
+
+
             </Card>
           )
         }
