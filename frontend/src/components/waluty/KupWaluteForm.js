@@ -22,7 +22,6 @@ function KupWaluteForm(props) {
     const url = "https://api.pro.coinbase.com";
 
     const [currencies, setCurrencies] = useState([]);
-    // const [currency, setCurrency] = useState({});
     const [ilosc, setIlosc] = useState(1);
     const [dni, setDni] = useState(7);
     const [user_id, setUser_id] = useState(0);
@@ -237,7 +236,8 @@ function KupWaluteForm(props) {
                                             value={ilosc}
                                             onChange={handleNumber}
                                             onBlur={handleFloat}
-                                            ref={iloscInputRef} />
+                                            ref={iloscInputRef} 
+                                            required/>
                                     </div>
                                 </div>
                                 <div className="col-sm">

@@ -3,7 +3,6 @@ import classes from './CardForm.module.css'
 import { useNavigate } from 'react-router-dom'
 import { usePaymentInputs } from 'react-payment-inputs'
 import { Form } from 'react-bootstrap'
-import valid from 'card-validator'
 
 
 
@@ -12,7 +11,7 @@ function CardForm(props) {
     const { meta, getCardNumberProps, getExpiryDateProps, getCVCProps } = usePaymentInputs();
 
     const { erroredInputs, touchedInputs } = meta;
-    const {cardNumber, setCardNumber} = useState("");
+    const [cardNumber, setCardNumber] = useState("");
 
     const inputCard = useRef();
 
@@ -32,20 +31,24 @@ function CardForm(props) {
         const number = e.target.value
         if (number.match(/[0-9]{16}/))
             setCardNumber(number);
+
+    }
+    const handleNumber = () => {
+        setCardNumber(parseFloat(cardNumber) || '')
     }
 
     return (
         <form className={classes.form} onSubmit={submitHandler}>
             <div className={classes.control}>
                 <Form.Label>Numer karty</Form.Label>
-                <Form.Control
+                <input
                     value={cardNumber}
-                    onBlur={handleCreditCard}
+                    onChange={handleNumber}
+                    onBlur={handleNumber}
                     ref={inputCard}
                     required
-                    placeholder="0000 0000 0000 0000"
                 />
-                <Form.Control.Feedback type="invalid">{erroredInputs.cardNumber}</Form.Control.Feedback>
+                {/* <Form.Control.Feedback type="invalid">{erroredInputs.cardNumber}</Form.Control.Feedback> */}
             </div>
             <div className={classes.control}>
                 <Form.Label>Data wazności</Form.Label>
