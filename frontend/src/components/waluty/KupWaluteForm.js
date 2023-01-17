@@ -4,6 +4,11 @@ import { useRef, useEffect, useState } from "react"
 import React from "react";
 import { formatData } from "../utils"
 import Plot from "./Plot";
+import axios from "axios";
+
+const axio = axios.create({
+    withCredentials: true,
+});
 
 function KupWaluteForm(props) {
 
@@ -17,47 +22,58 @@ function KupWaluteForm(props) {
     const url = "https://api.pro.coinbase.com";
 
     const [currencies, setCurrencies] = useState([]);
-    const [currency, setCurrency] = useState("");
     const [ilosc, setIlosc] = useState(1);
     const [dni, setDni] = useState(7);
-
+    const [user_id, setUser_id] = useState(0);
 
     useEffect(() => {
-        //connect to websocket API
-        ws.current = new WebSocket("wss://ws-feed.pro.coinbase.com");
-        //inside useEffect we need to make API with async function  
-        let pairs;
+        (async () => {
+            try {
+                const resp = await axio.get('http://localhost:5002/@me');
+                setUser_id(resp.data.id);
+            } catch (err) {
+                console.log("Not authenticated")
+            }
+        })();
+    }, []);
 
-        const apiCall = async () => {
-            await fetch(url + "/products")
-                .then((res) => res.json())
-                .then((data) => (pairs = data));
 
-            //coinbase returns over 120 currencies, this will filter to only USD based pairs
-            let filtered = pairs.filter((pair) => {
-                if (pair.quote_currency === "USD") {
-                    return pair;
-                }
-            });
+    // useEffect(() => {
+    // //connect to websocket API
+    // ws.current = new WebSocket("wss://ws-feed.pro.coinbase.com");
+    //     //inside useEffect we need to make API with async function  
+    //     let pairs;
 
-            //sort filtered currency pairs alphabetically
-            filtered = filtered.sort((a, b) => {
-                if (a.base_currency < b.base_currency) {
-                    return -1;
-                }
-                if (a.base_currency > b.base_currency) {
-                    return 1;
-                }
-                return 0;
-            });
+    //     const apiCall = async () => {
+    //         await fetch(url + "/products")
+    //             .then((res) => res.json())
+    //             .then((data) => (pairs = data));
 
-            setCurrencies(filtered);
+    //         //coinbase returns over 120 currencies, this will filter to only USD based pairs
+    //         let filtered = pairs.filter((pair) => {
+    //             if (pair.quote_currency === "USD") {
+    //                 return pair;
+    //             }
+    //         });
 
-            first.current = true;
-        };
+    //         //sort filtered currency pairs alphabetically
+    //         filtered = filtered.sort((a, b) => {
+    //             if (a.base_currency < b.base_currency) {
+    //                 return -1;
+    //             }
+    //             if (a.base_currency > b.base_currency) {
+    //                 return 1;
+    //             }
+    //             return 0;
+    //         });
 
-        apiCall()
-    }, [])
+    //         setCurrencies(filtered);
+
+    //         first.current = true;
+    //     };
+
+    //     apiCall()
+    // }, [])
 
     useEffect(() => {
         if (!first.current) {
@@ -105,20 +121,25 @@ function KupWaluteForm(props) {
     }, [pair, dni]);
 
 
-    // useEffect(() => {
-    //     fetch('http://127.0.0.1:5003/currency/get', {
-    //         'method': 'GET',
-    //         headers: {
-    //             'Content-Type': 'application/json'
-    //         }
-    //     })
-    //         .then(resp => resp.json())
-    //         .then(resp => setCurrencies(resp.map((cur) => { 
-    //             cur.symbol += "-USD" 
-    //             return cur
-    //         })))
-    //         .catch(err => console.log(err))
-    // }, []);
+    useEffect(() => {
+        //connect to websocket API
+        ws.current = new WebSocket("wss://ws-feed.pro.coinbase.com");
+
+        fetch('http://127.0.0.1:5003/currency/get', {
+            'method': 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(resp => resp.json())
+            .then(resp => setCurrencies(resp.map((cur) => {
+                cur.symbol += "-USD"
+                return cur
+            })))
+            .catch(err => console.log(err))
+        // setCurrencies(currencies.filter((cur) => {cur.nazwa !== 'USD-USD'}))
+        first.current = true;
+    }, []);
 
 
     const walutaInputRef = useRef(); // w tym inpucie tworzymy połączenie z tym
@@ -135,15 +156,21 @@ function KupWaluteForm(props) {
         const enteredKurs = price;
         const enteredCena = price * parseFloat(enteredilosc);
 
+        const waluta = currencies.filter((cur) => { return cur.symbol === enteredWaluta})[0]
+        console.log(waluta)
+
         const transactionData = {
-            waluta: enteredWaluta,
+            waluta_name: waluta.nazwa,
+            waluta_id: waluta.id,
             ilosc: enteredilosc,
             cena: enteredCena,
-            kurs: enteredKurs
+            kurs: enteredKurs,
+            klient: user_id,
+            data: new Date().toJSON()
         }
         console.log(transactionData)
 
-        props.onSubmitForm(transactionData)
+        props.onSubmitForm(transactionData, currencies)
     }
 
     const handleSelect = (e) => {
@@ -156,7 +183,10 @@ function KupWaluteForm(props) {
 
         ws.current.send(unsub);
 
-        setpair(e.target.value);
+        const waluta = e.target.value
+        console.log(waluta)
+
+        setpair(waluta);
     };
 
     const handleNumber = (e) => {
@@ -169,10 +199,7 @@ function KupWaluteForm(props) {
     }
 
     const handleFloat = () => {
-
-        // The conditional prevents parseFloat(null) = NaN (when the user deletes the input)
         setIlosc(parseFloat(ilosc) || '')
-
     }
 
     if (loading) {
@@ -186,7 +213,7 @@ function KupWaluteForm(props) {
                                     <div className="ms-2">
                                         <label htmlFor={'waluta'}>Waluta</label>
                                         <select className="form-select" type="text" required id="waluta" ref={walutaInputRef} onChange={handleSelect}>
-                                            {currencies.map((cur) => { return <option key={cur.id} value={cur.id}>{cur.id}</option> })}
+                                            {currencies.map((cur) => { return <option key={cur.id} value={cur.symbol}>{cur.symbol}</option> })}
                                         </select>
                                     </div>
                                 </div>
@@ -209,7 +236,8 @@ function KupWaluteForm(props) {
                                             value={ilosc}
                                             onChange={handleNumber}
                                             onBlur={handleFloat}
-                                            ref={iloscInputRef} />
+                                            ref={iloscInputRef} 
+                                            required/>
                                     </div>
                                 </div>
                                 <div className="col-sm">
@@ -241,7 +269,7 @@ function KupWaluteForm(props) {
                                         <div className="ms-2">
                                             <label htmlFor={'waluta'}>Waluta</label>
                                             <select className="form-select" type="text" required id="waluta" ref={walutaInputRef} onChange={handleSelect}>
-                                                {currencies.map((cur) => { return <option key={cur.id} value={cur.id}>{cur.id}</option> })}
+                                                {currencies.map((cur) => { return <option key={cur.id} value={cur.symbol}>{cur.symbol}</option> })}
                                             </select>
                                         </div>
                                     </div>

@@ -67,8 +67,9 @@ class EdycjePostu(posts_db.Model):
         self.post = post_id
         self.edytujacy = edytujacy
 
-    def __repr__(self):
-        return f"Edycja postu: {self.zawartosc}, id postu: {self.post}, id edyt. {self.edytujacy}"
+
+    def __init__(self, zawartosc):
+        self.zawartosc = zawartosc
     
 
 class Klient(posts_db.Model):
@@ -87,19 +88,19 @@ class Klient(posts_db.Model):
         return f"Użytkownik {self.imie}, {self.login}"
         
 
-class Admin(posts_db.Model): #
+# class Admin(posts_db.Model): #
 
     id = posts_db.Column(posts_db.Integer, primary_key=True)
     imie = posts_db.Column(posts_db.String(20), nullable=False)
     nazwisko = posts_db.Column(posts_db.String(20), nullable=False)
     posts = posts_db.relationship('Post', lazy=True)    #relacja
 
-    def __init__(self, imie, nazwisko):
-        self.imie = imie
-        self.nazwisko = nazwisko
+#     def __init__(self, imie, nazwisko):
+#         self.imie = imie
+#         self.nazwisko = nazwisko
 
-    def __repr__(self):
-        return f"Użytkownik {self.imie}, {self.login}"
+#     def __repr__(self):
+#         return f"Użytkownik {self.imie}, {self.login}"
 
 
 
@@ -111,13 +112,6 @@ class postSchema(posts_ma.Schema):
 post_schema = postSchema()
 posts_schema = postSchema(many=True)
 
-
-class userSchema(posts_ma.Schema):
-    class Meta:
-        fields = ('id', 'imie', 'nazwisko')
-
-user_schema = userSchema()
-users_schema = userSchema(many=True)
 
 @posts_app.route('/get', methods=['GET'])
 @cross_origin()
@@ -178,20 +172,6 @@ def deletePost(id):
     posts_db.session.commit()
 
     return post_schema.jsonify(post)
-
-
-# @posts_app.route('/user/add', methods=['POST'])
-# def addUser():
-#     id = request.json['id']
-#     imie = request.json['imie']
-#     nazwisko = request.json['nazwisko']
-#
-#     user = Klient(id, imie, nazwisko)
-#
-#     posts_db.session.add(user)
-#     posts_db.session.commit()
-#
-#     return user_schema.jsonify(user)
 
 
 if __name__ == '__main__':
