@@ -7,6 +7,7 @@ import Moment from 'moment';
 import { useState } from "react"
 import axios from "axios";
 import { useEffect } from "react"
+import UserName from "./UserName"
 
 const axio = axios.create({
   withCredentials: true,
@@ -69,27 +70,20 @@ function PostyList(props) {
               <div className={classes2.content}>
                 <h3>{post.tytul}</h3>
                 <h4>{formatDate(post.dataUtworzenia)}</h4>
+                <UserName id={post.client_id}/>
                 <p>{post.tresc}</p>
               </div>
-
 
               {/*sprawdzenie id tego użytkownika*/}
               {
                 (czyAdmin || currUser == post.client_id) &&
                 <div className={classes2.actions}>
-
                   <button onClick={() => usunPost(post)}>Usuń</button>
                   <p> </p>
                   {/*<button onClick={() => editPost(post)}>Edytuj</button>*/}
                   <button onClick={() => navigateToEdit(post)}>Edytuj</button>
-
                 </div>
               }
-
-
-              {/*<button onClick={() => PotwierdzenieUsuniecia(post = post)}>Usuń</button>*/}
-
-
             </Card>
           )
         }

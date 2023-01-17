@@ -67,6 +67,8 @@ class EdycjePostu(posts_db.Model):
         self.post = post_id
         self.edytujacy = edytujacy
 
+    def __repr__(self):
+        return f"Edycja postu: {self.zawartosc}, id postu: {self.post}, id edyt. {self.edytujacy}"
     
 
 class Klient(posts_db.Model):
@@ -89,7 +91,7 @@ class Admin(posts_db.Model): #
 
     id = posts_db.Column(posts_db.Integer, primary_key=True)
     imie = posts_db.Column(posts_db.String(20), nullable=False)
-    nawzisko = posts_db.Column(posts_db.String(20), nullable=False)
+    nazwisko = posts_db.Column(posts_db.String(20), nullable=False)
     posts = posts_db.relationship('Post', lazy=True)    #relacja
 
     def __init__(self, imie, nazwisko):
@@ -152,15 +154,16 @@ def editPost(id):
 
     updatedTresc = request.json['tresc']
     updatedTytul = request.json['tytul']
+    zawartosc = updatedTytul + ', ' + updatedTresc
     autor = request.json['autor']
 
-    edycja = EdycjePostu(zawartosc=post.tresc, post_id=id, edytujacy=autor)  # tu potem zamiast 0 bedzie id zalogowanego uzytkownika
+    edycja = EdycjePostu(zawartosc=zawartosc, post_id=id, edytujacy=autor)  # tu potem zamiast 0 bedzie id zalogowanego uzytkownika
     post.tresc = updatedTresc
     post.tytul = updatedTytul
     post.dataUtworzenia = datetime.now()
     post.status = StatusPostu.EDYTOWANY.value
 
-
+    print(edycja)
     # posts_db.session.add(edycja)
     posts_db.session.commit()
 
