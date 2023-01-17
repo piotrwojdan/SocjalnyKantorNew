@@ -7,13 +7,16 @@ function PodsumowanieWaluty() {
     const transactionData = location.state
 
     function addTransaction(transactionData) {
-        fetch("https://127.0.0.1:5003/transaction/add", {
+        console.log(JSON.stringify(transactionData))
+
+        fetch("http://127.0.0.1:5003/transaction/add", {
             "method": "POST",
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(transactionData)
         })
+        .catch(err => console.error(err))
         // navigate('/');
     }
 

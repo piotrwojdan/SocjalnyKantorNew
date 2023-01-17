@@ -12,7 +12,7 @@ function CardForm(props) {
     const { meta, getCardNumberProps, getExpiryDateProps, getCVCProps } = usePaymentInputs();
 
     const { erroredInputs, touchedInputs } = meta;
-    const {cardNumber, setCardNumber} = useState("")
+    const {cardNumber, setCardNumber} = useState("");
 
     const inputCard = useRef();
 
@@ -28,9 +28,9 @@ function CardForm(props) {
         props.onSubmitForm(moretransactionData)
     }
 
-    function handleCreditCard(e) {
+    const handleCreditCard = (e) => {
         const number = e.target.value
-        if (valid.number(number))
+        if (number.match(/[0-9]{16}/))
             setCardNumber(number);
     }
 
@@ -43,7 +43,6 @@ function CardForm(props) {
                     onBlur={handleCreditCard}
                     ref={inputCard}
                     required
-                    isInvalid={touchedInputs.cardNumber && erroredInputs.cardNumber}
                     placeholder="0000 0000 0000 0000"
                 />
                 <Form.Control.Feedback type="invalid">{erroredInputs.cardNumber}</Form.Control.Feedback>

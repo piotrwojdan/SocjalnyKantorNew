@@ -60,7 +60,7 @@ class Transakcja(currencies_db.Model):
     ilosc = currencies_db.Column(currencies_db.Float, nullable=False)
     cenaJednostkowa = currencies_db.Column(currencies_db.Float, nullable=False)
     cenaCalkowita = currencies_db.Column(currencies_db.Float, nullable=False)
-    numerKarty = currencies_db.Column(currencies_db.String(40), nullable=False)
+    numerKarty = currencies_db.Column(currencies_db.String(40), nullable=True)
     dataUtworzenia = currencies_db.Column(
         currencies_db.DateTime, nullable=False)
     dataZakonczenia = currencies_db.Column(
@@ -69,7 +69,7 @@ class Transakcja(currencies_db.Model):
         currencies_db.Integer, currencies_db.ForeignKey("waluta.id"), nullable=False)
     klientId = currencies_db.Column(currencies_db.Integer, nullable=False)
     rachunekId = currencies_db.Column(
-        currencies_db.Integer, currencies_db.ForeignKey("rachunek.id"), nullable=False)
+        currencies_db.Integer, currencies_db.ForeignKey("rachunek.id"), nullable=True)
 
     def __init__(self, ilosc, waluta_id, cena_jednostkowa, cenaCalkowita, dataUtworzenia, dataZakonczenia, user_id, rachunek_id, numer_karty):
         self.ilosc = float(ilosc)
@@ -119,16 +119,17 @@ def add_currency():
 
 
 @currencies_app.route('/transaction/add', methods=['POST'])
+@cross_origin()
 def add_transaction():
     ilosc = request.json['ilosc']
     cenaJednostkowa = request.json['cenaJedn']
     cenaCalkowita = request.json['cenaCalk']
-    numerKarty = request.json['nrKarty']
+    numerKarty = request.json.get('nrKarty', None)
     dataUtworzenia = request.json['dataU']
     dataZakonczenia = request.json['dataZ']
     walutaId = request.json['waluta']
     klientId = request.json['klient']
-    rachunekId = request.json['idRachunku']
+    rachunekId = request.json.get('idRachunku', None)
 
     dataUtworzenia = datetime.strptime(dataUtworzenia, '%Y-%m-%dT%H:%M:%S.%f%z')
     dataZakonczenia = datetime.strptime(dataZakonczenia, '%Y-%m-%dT%H:%M:%S.%f%z')
