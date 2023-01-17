@@ -7,6 +7,7 @@ import Moment from 'moment';
 import { useState } from "react"
 import axios from "axios";
 import { useEffect } from "react"
+import UserName from "./UserName"
 
 const axio = axios.create({
   withCredentials: true,
@@ -23,7 +24,7 @@ function PostyList(props) {
     (async () => {
       try {
         const resp = await axio.get('http://localhost:5002/@me')
-        console.log(resp.data['czyAdmin'])
+        // console.log(resp.data['czyAdmin'])
         setCurrUser(resp.data['id'])
         setCzyAdmin(resp.data["czyAdmin"])
       } catch (err) {
@@ -69,27 +70,20 @@ function PostyList(props) {
               <div className={classes2.content}>
                 <h3>{post.tytul}</h3>
                 <h4>{formatDate(post.dataUtworzenia)}</h4>
+                <UserName id={post.client_id}/>
                 <p>{post.tresc}</p>
               </div>
-
 
               {/*sprawdzenie id tego użytkownika*/}
               {
                 (czyAdmin || currUser == post.client_id) &&
                 <div className={classes2.actions}>
-
                   <button onClick={() => usunPost(post)}>Usuń</button>
                   <p> </p>
                   {/*<button onClick={() => editPost(post)}>Edytuj</button>*/}
                   <button onClick={() => navigateToEdit(post)}>Edytuj</button>
-
                 </div>
               }
-
-
-              {/*<button onClick={() => PotwierdzenieUsuniecia(post = post)}>Usuń</button>*/}
-
-
             </Card>
           )
         }
