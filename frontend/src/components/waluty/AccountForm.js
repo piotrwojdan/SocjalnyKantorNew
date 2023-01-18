@@ -1,10 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react'
 import classes from './CardForm.module.css'
 import { useNavigate } from 'react-router-dom'
+import axios from "axios";
+
+
+const axio = axios.create({
+    withCredentials: true,
+});
 
 
 function AccountForm(props) {
     const [accounts, setAccounts] = useState([]);
+    const currencies = props.currencies;
     const accountRef = useRef();
 
     const navigate = useNavigate();
@@ -14,8 +21,11 @@ function AccountForm(props) {
 
         let chosenAccount = accountRef.current.value;
 
+        const temp = accounts.filter(acc => {return acc.numer.toString() === chosenAccount})[0];
+        console.log(temp)
+
         const moretransactionData = {
-            idRachunku: chosenAccount
+            idRachunku: temp.id
         }
         console.log(moretransactionData)
 
@@ -23,25 +33,39 @@ function AccountForm(props) {
     }
 
     useEffect(() => {
-        fetch("http://127.0.0.1:5003/accounts", {
-            'method': 'GET',
-            'headers': {
-                'Content-Type': 'application/json'
+        (async () => {
+            try {
+                const resp = await axio.post('http://localhost:5003/accounts/get', { klient: props.user_id })
+                let accs = resp.data
+                accs = accs.map((acc) => {
+                    let result = currencies.filter( cur => cur.id === acc.walutaId);
+                    acc.walutaId = result[0].symbol
+                    return acc
+                })
+                accs = accs.filter((acc) => {return acc.walutaId === "USD"});
+                setAccounts(accs)
+            } catch (err) {
+                console.log("Not authenticated")
             }
-        })
-            .then(resp => resp.json())
-            .then(resp => setAccounts(resp))
-            .catch(err => console.log(err))
+        })();
     }, [])
+
+    const handleSelect = (e) => {
+        let chosenAccount = accountRef.current.value;
+
+        const temp = accounts.filter(acc => {return acc.numer.toString() === chosenAccount})[0];
+        if (temp.saldo < props.cena) {
+            alert("Za mało środków na wybranym rachunku!")
+        }
+    }
 
     return (
         <form className={classes.form} onSubmit={submitHandler}>
             <div className="container my-4">
                 <div className={classes.control}>
                     <label htmlFor={'account'}>Rachunek</label>
-                    <select className="form-select" type="text" required ref={accountRef}>
-                        {accounts.map((cur) => { return <option key={cur.id} value={cur.id}>{cur.numer}</option> })}
-                        <option key="1" value="1">1</option>
+                    <select className="form-select" type="text" required ref={accountRef} onChange={handleSelect}>
+                        {accounts.map((acc) => { return <option key={acc.id} value={acc.numer}>{acc.numer} --- {acc.walutaId}</option> })}
                     </select>
                 </div>
                 <div className={classes.actions}>

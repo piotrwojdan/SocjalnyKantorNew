@@ -61,9 +61,6 @@ class EdycjePostu(posts_db.Model):
         self.post = post_id
         self.edytujacy = edytujacy
 
-    def __repr__(self):
-        return f"Edycja postu: {self.zawartosc}, id postu: {self.post}, id edyt. {self.edytujacy}"
-
 
 # this is for jsonification of our post objects
 class postSchema(posts_ma.Schema):
@@ -73,7 +70,6 @@ class postSchema(posts_ma.Schema):
 
 post_schema = postSchema()
 posts_schema = postSchema(many=True)
-
 
 
 @posts_app.route('/get', methods=['GET'])

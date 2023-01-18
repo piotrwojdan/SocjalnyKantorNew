@@ -2,12 +2,9 @@ from flask import Flask, request, jsonify, session
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from flask_login import current_user
 from flask_cors import CORS, cross_origin
 from flask_bcrypt import Bcrypt
-import requests, json
 import redis
 from flask_session import Session
 
@@ -16,14 +13,12 @@ CORS(users_app, supports_credentials=True)
 
 users_app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 users_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+users_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 users_app.config['SESSION_TYPE'] = 'redis'
 users_app.config['CORS_HEADERS'] = 'Content-Type'
 
 users_db = SQLAlchemy(users_app)
 users_ma = Marshmallow(users_app)
-
-users_app.config['JWT_SECRET_KEY'] = '78f8fd67gf7gd8fg68df7g6800gs7ff897s9d'
-users_jwt = JWTManager(users_app)
 
 bcrypt = Bcrypt(users_app)
 
@@ -43,6 +38,8 @@ class User(users_db.Model):
     haslo = users_db.Column(users_db.String(60), nullable=False)
     dataUrodzenia = users_db.Column(users_db.Date, nullable=False)
     czyAdmin = users_db.Column(users_db.Boolean, nullable=False, default=False)
+    # posts = users_db.relationship('Post', backref='author', lazy=True)    #relacja
+    # rachunki = db.relationship('Rachunek', backref='author', lazy=True)
 
     def __init__(self, imie, nazwisko, login, haslo, dataUrodzenia, czyAdmin):
         self.imie = imie
@@ -64,9 +61,9 @@ class UserSchema(users_ma.Schema):
     class Meta:
         fields = ('id', 'imie', 'nazwisko', 'login', 'haslo', 'dataUrodzenia', 'czyAdmin')
 
-
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
+
 
 
 @users_app.route("/@me")
@@ -92,9 +89,10 @@ def get_users():
     return jsonify([e.to_dict() for e in users])
 
 
-@users_app.route("/register", methods=['POST'])
+@users_app.route("/register", methods=['POST', 'OPTIONS'])
 @cross_origin()
 def register():
+
     imie = request.json['imie']
     nazwisko = request.json['nazwisko']
     login = request.json['login']
@@ -137,6 +135,7 @@ def login():
     return user_schema.jsonify(user)
 
 
+
 @users_app.route("/logout", methods=['POST'])
 @cross_origin()
 def logout():
@@ -149,6 +148,7 @@ def logout():
 def after_each(response):
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
+
 
 
 if __name__ == '__main__':
