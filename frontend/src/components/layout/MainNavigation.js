@@ -14,18 +14,18 @@ function MainNavigation(){
 
   const [isLogged, setIsLogged] = useState(true)
 
-  //sprawdzenie czy jest zalogowany jeśli tak to wyswietlamy co innego w navbarze
-  // useEffect(() => {
-  //   (async () => {
-  //     try {
-  //       const resp = await httpClient.get('http://localhost:5002/@me')
-  //     } catch (err) {
-  //        if (err.response.status === 401){
-  //          setIsLogged(false)
-  //        }
-  //     }
-  //   })();
-  // });
+  // sprawdzenie czy jest zalogowany jeśli tak to wyswietlamy co innego w navbarze
+  useEffect(() => {
+    (async () => {
+      try {
+        const resp = await httpClient.get('http://localhost:5002/@me')
+      } catch (err) {
+         if (err.response.status === 401){
+           setIsLogged(false)
+         }
+      }
+    })();
+  });
 
   return(
     <header className={classes.header}>
@@ -51,12 +51,12 @@ function MainNavigation(){
               <Link to="/konto">Konto</Link>
             </li>
           }
-          {isLogged &&
+          {!isLogged &&
             <li>
               <Link to="/login">Zaloguj się</Link>
             </li>
           }
-          {isLogged &&
+          {!isLogged &&
             <li>
               <Link to="/register">Rejestracja</Link>
             </li>
