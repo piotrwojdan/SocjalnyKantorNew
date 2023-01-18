@@ -5,7 +5,7 @@ import React from 'react'
 import { useEffect, useState } from "react"
 
 
-function MainNavigation(){
+function MainNavigation() {
 
   const logoutUser = async () => {
     const resp = await httpClient.post('http://localhost:5002/logout')
@@ -20,14 +20,14 @@ function MainNavigation(){
       try {
         const resp = await httpClient.get('http://localhost:5002/@me')
       } catch (err) {
-         if (err.response.status === 401){
-           setIsLogged(false)
-         }
+        if (err.response.status === 401) {
+          setIsLogged(false)
+        }
       }
     })();
   });
 
-  return(
+  return (
     <header className={classes.header}>
       <div className={classes.logo}>Socjalny Kantor</div>
       <nav>
@@ -36,13 +36,15 @@ function MainNavigation(){
             <Link to='/'>Posty</Link>
           </li>
           {isLogged &&
-            <li>
-              <Link to='/dodajpost'>Dodaj post</Link>
-            </li>
+            <>
+              <li>
+                <Link to='/dodajpost'>Dodaj post</Link>
+              </li>
+              <li>
+                <Link to="/exchange">Wymiana walut</Link>
+              </li>
+            </>
           }
-          <li>
-            <Link to="/exchange">Wymiana walut</Link>
-          </li>
           <li>
             <Link to="/about">O nas</Link>
           </li>
@@ -63,12 +65,12 @@ function MainNavigation(){
           }
           {isLogged &&
             <li>
-            <button className={classes.baton} onClick={logoutUser}>Wyloguj</button>
-          </li>}
+              <button className={classes.baton} onClick={logoutUser}>Wyloguj</button>
+            </li>}
         </ul>
       </nav>
     </header>
-    );
+  );
 }
 
 export default MainNavigation;
