@@ -11,12 +11,14 @@ function Summary(props) {
     console.log(transactionData)
     const navigate = useNavigate()
     const {waluta_name, waluta_id, ilosc, cena, kurs, klient, data} = transactionData
+    let timer;
     
     useEffect(() => {
-        setTimeout(() => {
+        timer = setTimeout(() => {
             alert("Czas sesji się zakończył, aby dokonać zakupy wybierz ponownie walutę i podaj ilość!");
             navigate("/exchange");
-        }, 15 * 60 * 1000)
+        }, 15 * 1000)
+        return () => clearTimeout(timer)
     }, [])
 
     function sumbitHandler(event) {
