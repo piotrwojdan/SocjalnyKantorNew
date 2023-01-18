@@ -29,7 +29,7 @@ currencies_schema = CurrencySchema(many=True)
 
 class transactionSchema(currencies_ma.Schema):
     class Meta:
-        fields = ('id', 'ilosc', 'cenaJedn', 'cena', 'nrKarty', 'idRachunku')
+        fields = ('id', 'ilosc', 'cenaJednostkowa', 'cenaCalkowita', 'numerKarty', 'rachunekId', 'dataZakonczenia', 'walutaId', 'klientId')
 
 
 transaction_schema = transactionSchema()
@@ -171,7 +171,7 @@ def get_transactions():
     transakcje = Transakcja.query.filter_by(klientId=user_id).all()
 
     results = transactions_schema.jsonify(transakcje)
-    return jsonify(results)
+    return results
 
 @currencies_app.route('/accounts/get', methods=['POST'])
 @cross_origin()
