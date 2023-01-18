@@ -156,19 +156,6 @@ def add_rachunek():
 
     return rachunek_schema.jsonify(rachunek)
 
-# @currencies_app.route('/user/add', methods=['POST'])
-# def addUser():
-#     id = request.json['id']
-#     imie = request.json['imie']
-#     nazwisko = request.json['nazwisko']
-#
-#     user = Klient(id, imie, nazwisko)
-#
-#     currencies_db.session.add(user)
-#     currencies_db.session.commit()
-#
-#     return user_schema.jsonify(user)
-
 
 if __name__ == '__main__':
     # with currencies_app.app_context():
