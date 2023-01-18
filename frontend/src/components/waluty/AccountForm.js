@@ -42,6 +42,7 @@ function AccountForm(props) {
                     acc.walutaId = result[0].symbol
                     return acc
                 })
+                accs = accs.filter((acc) => {return acc.walutaId === "USD"});
                 setAccounts(accs)
             } catch (err) {
                 console.log("Not authenticated")
@@ -49,12 +50,21 @@ function AccountForm(props) {
         })();
     }, [])
 
+    const handleSelect = (e) => {
+        let chosenAccount = accountRef.current.value;
+
+        const temp = accounts.filter(acc => {return acc.numer.toString() === chosenAccount})[0];
+        if (temp.saldo < props.cena) {
+            alert("Za mało środków na wybranym rachunku!")
+        }
+    }
+
     return (
         <form className={classes.form} onSubmit={submitHandler}>
             <div className="container my-4">
                 <div className={classes.control}>
                     <label htmlFor={'account'}>Rachunek</label>
-                    <select className="form-select" type="text" required ref={accountRef}>
+                    <select className="form-select" type="text" required ref={accountRef} onChange={handleSelect}>
                         {accounts.map((acc) => { return <option key={acc.id} value={acc.numer}>{acc.numer} --- {acc.walutaId}</option> })}
                     </select>
                 </div>

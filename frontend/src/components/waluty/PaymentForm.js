@@ -3,7 +3,7 @@ import AccountForm from './AccountForm'
 import CardForm from './CardForm'
 import { useState, useEffect } from 'react';
 
-function PaymentForm({payment, user, submitHandler}) {
+function PaymentForm({payment, user, submitHandler, cena}) {
   const [currencies, setCurrencies] = useState([]);
 
 
@@ -23,7 +23,7 @@ function PaymentForm({payment, user, submitHandler}) {
   if (payment === "card") {
     return <CardForm onSubmitForm={submitHandler}/>
   } else if (payment === "account") {
-    return <AccountForm user_id={user} onSubmitForm={submitHandler} currencies={currencies}/>
+    return <AccountForm user_id={user} onSubmitForm={submitHandler} currencies={currencies} cena={cena}/>
   } else {
     return <></>
   }

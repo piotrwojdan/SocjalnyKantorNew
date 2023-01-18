@@ -17,7 +17,9 @@ function CardForm(props) {
 
     function submitHandler(event) {
         event.preventDefault();
-        console.log(inputCard.current.value)
+
+        if (inputCard.current.value.length !== 16) 
+            return;
 
         const moretransactionData = {
             nrKarty: inputCard.current.value
@@ -27,29 +29,30 @@ function CardForm(props) {
         props.onSubmitForm(moretransactionData)
     }
 
-    const handleCreditCard = (e) => {
-        const number = e.target.value
-        if (number.match(/[0-9]{16}/))
-            setCardNumber(number);
+    const handleNumber = (e) => {
+        const re = /^[0-9\b]+$/;
 
-    }
-    const handleNumber = () => {
-        setCardNumber(parseFloat(cardNumber) || '')
+        // if value is not blank, then test the regex
+    
+        if (e.target.value === '' || re.test(e.target.value) && e.target.value.length <= 16) {
+           setCardNumber(e.target.value)
+        }
     }
 
     return (
         <form className={classes.form} onSubmit={submitHandler}>
             <div className={classes.control}>
                 <Form.Label>Numer karty</Form.Label>
-                <input
+                <Form.Control
                     value={cardNumber}
                     onChange={handleNumber}
-                    onBlur={handleNumber}
                     ref={inputCard}
                     required
+                    placeholder='1234123412341234'
+                    isInvalid={cardNumber !== "" && cardNumber.length < 16}
                 />
-                {/* <Form.Control.Feedback type="invalid">{erroredInputs.cardNumber}</Form.Control.Feedback> */}
             </div>
+            <Form.Control.Feedback type="invalid">Niepoprawny nr karty</Form.Control.Feedback>
             <div className={classes.control}>
                 <Form.Label>Data wazności</Form.Label>
                 <Form.Control

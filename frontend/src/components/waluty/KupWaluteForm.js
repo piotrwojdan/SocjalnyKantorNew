@@ -38,43 +38,6 @@ function KupWaluteForm(props) {
     }, []);
 
 
-    // useEffect(() => {
-    // //connect to websocket API
-    // ws.current = new WebSocket("wss://ws-feed.pro.coinbase.com");
-    //     //inside useEffect we need to make API with async function  
-    //     let pairs;
-
-    //     const apiCall = async () => {
-    //         await fetch(url + "/products")
-    //             .then((res) => res.json())
-    //             .then((data) => (pairs = data));
-
-    //         //coinbase returns over 120 currencies, this will filter to only USD based pairs
-    //         let filtered = pairs.filter((pair) => {
-    //             if (pair.quote_currency === "USD") {
-    //                 return pair;
-    //             }
-    //         });
-
-    //         //sort filtered currency pairs alphabetically
-    //         filtered = filtered.sort((a, b) => {
-    //             if (a.base_currency < b.base_currency) {
-    //                 return -1;
-    //             }
-    //             if (a.base_currency > b.base_currency) {
-    //                 return 1;
-    //             }
-    //             return 0;
-    //         });
-
-    //         setCurrencies(filtered);
-
-    //         first.current = true;
-    //     };
-
-    //     apiCall()
-    // }, [])
-
     useEffect(() => {
         if (!first.current) {
             return;
@@ -98,25 +61,23 @@ function KupWaluteForm(props) {
                 .then((data) => (dataArr = data))
                 .catch(err => console.log(err));
 
-            //helper function to format data that will be implemented later
             let formattedData = formatData(dataArr);
             setpastData(formattedData);
         };
 
         fetchHistoricalData();
         setLoading(false);
-        //need to update event listener for the websocket object so that it is listening for the newly updated currency pair
+
         ws.current.onmessage = (e) => {
             let data = JSON.parse(e.data);
             if (data.type !== "ticker") {
                 return;
             }
-            //every time we receive an even from the websocket for our currency pair, update the price in state
+
             if (data.product_id === pair) {
                 setprice(data.price);
             }
         };
-        //dependency array is passed pair state, will run on any pair state change
 
     }, [pair, dni]);
 
@@ -133,17 +94,18 @@ function KupWaluteForm(props) {
         })
             .then(resp => resp.json())
             .then(resp => setCurrencies(resp.map((cur) => {
-                cur.symbol += "-USD"
+                cur.symbol += "-USD";
                 return cur
             })))
             .catch(err => console.log(err))
         // setCurrencies(currencies.filter((cur) => {cur.nazwa !== 'USD-USD'}))
         first.current = true;
+
     }, []);
 
 
-    const walutaInputRef = useRef(); // w tym inpucie tworzymy połączenie z tym
-    const iloscInputRef = useRef();
+    const walutaInputRef = useRef(); // w tym mijescu tworzymy połączenie z inputem
+    const iloscInputRef = useRef(); // zeby przekazac je do submitHandler
 
 
     //react automatycznie przekaż event do tej funkcji jeśli wpiszemy ją w onSubmit
@@ -156,7 +118,7 @@ function KupWaluteForm(props) {
         const enteredKurs = price;
         const enteredCena = price * parseFloat(enteredilosc);
 
-        const waluta = currencies.filter((cur) => { return cur.symbol === enteredWaluta})[0]
+        const waluta = currencies.filter((cur) => { return cur.symbol === enteredWaluta })[0]
         console.log(waluta)
 
         const transactionData = {
@@ -170,7 +132,7 @@ function KupWaluteForm(props) {
         }
         console.log(transactionData)
 
-        props.onSubmitForm(transactionData, currencies)
+        props.onSubmitForm(transactionData)
     }
 
     const handleSelect = (e) => {
@@ -184,7 +146,6 @@ function KupWaluteForm(props) {
         ws.current.send(unsub);
 
         const waluta = e.target.value
-        console.log(waluta)
 
         setpair(waluta);
     };
@@ -213,7 +174,8 @@ function KupWaluteForm(props) {
                                     <div className="ms-2">
                                         <label htmlFor={'waluta'}>Waluta</label>
                                         <select className="form-select" type="text" required id="waluta" ref={walutaInputRef} onChange={handleSelect}>
-                                            {currencies.map((cur) => { return <option key={cur.id} value={cur.symbol}>{cur.symbol}</option> })}
+                                            <option key="" value=""></option>
+                                            {currencies.map((cur) => { if (cur.symbol !== "USD-USD") return <option key={cur.id} value={cur.symbol}>{cur.symbol}</option> })}
                                         </select>
                                     </div>
                                 </div>
@@ -236,8 +198,8 @@ function KupWaluteForm(props) {
                                             value={ilosc}
                                             onChange={handleNumber}
                                             onBlur={handleFloat}
-                                            ref={iloscInputRef} 
-                                            required/>
+                                            ref={iloscInputRef}
+                                            required />
                                     </div>
                                 </div>
                                 <div className="col-sm">
@@ -269,7 +231,8 @@ function KupWaluteForm(props) {
                                         <div className="ms-2">
                                             <label htmlFor={'waluta'}>Waluta</label>
                                             <select className="form-select" type="text" required id="waluta" ref={walutaInputRef} onChange={handleSelect}>
-                                                {currencies.map((cur) => { return <option key={cur.id} value={cur.symbol}>{cur.symbol}</option> })}
+                                                <option key="" value=""></option>
+                                                {currencies.map((cur) => { if (cur.symbol !== "USD-USD") return <option key={cur.id} value={cur.symbol}>{cur.symbol}</option> })}
                                             </select>
                                         </div>
                                     </div>

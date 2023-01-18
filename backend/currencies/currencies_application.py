@@ -201,6 +201,19 @@ def add_rachunek():
 
     return rachunek_schema.jsonify(rachunek)
 
+@currencies_app.route('/account/add', methods=['PUT'])
+def add_to_account():
+    rachunekId = request.json["rachunekId"]
+    wplata = request.json["wplata"]
+
+    rachunek = Rachunek.query.get(rachunekId)
+    rachunek.saldo += float(wplata)
+
+    currencies_db.session.commit()
+
+    return rachunek_schema.jsonify(rachunek)
+
+
 @currencies_app.after_request
 def after_each(response):
     response.headers.add('Access-Control-Allow-Credentials', 'true')

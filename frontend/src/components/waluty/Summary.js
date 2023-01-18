@@ -1,5 +1,5 @@
-import React from 'react'
-import { useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom';
 import LargeCard from '../ui/LargeCard';
 import classes from './Summary.module.css'
 import { useState } from 'react'
@@ -9,9 +9,15 @@ import PaymentForm from './PaymentForm';
 function Summary(props) {
     const transactionData = props.transactionData
     console.log(transactionData)
-
+    const navigate = useNavigate()
     const {waluta_name, waluta_id, ilosc, cena, kurs, klient, data} = transactionData
     
+    useEffect(() => {
+        setTimeout(() => {
+            alert("Czas sesji się zakończył, aby dokonać zakupy wybierz ponownie walutę i podaj ilość!");
+            navigate("/exchange");
+        }, 15 * 60 * 1000)
+    }, [])
 
     function sumbitHandler(event) {
 
@@ -109,7 +115,7 @@ function Summary(props) {
                     </div>
                 </div>
 
-                <PaymentForm payment={payment} user={transactionData.klient} submitHandler={sumbitHandler}/>
+                <PaymentForm payment={payment} user={transactionData.klient} submitHandler={sumbitHandler} cena={cena}/>
             </LargeCard>
         </>
     )
