@@ -17,7 +17,7 @@ function Summary(props) {
         timer = setTimeout(() => {
             alert("Czas sesji się zakończył, aby dokonać zakupy wybierz ponownie walutę i podaj ilość!");
             navigate("/exchange");
-        }, 15 * 1000)
+        }, 15 * 60 * 1000)
         return () => clearTimeout(timer)
     }, [])
 
