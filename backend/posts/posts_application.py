@@ -7,7 +7,6 @@ from datetime import datetime, timezone
 from enum import Enum
 from sqlalchemy import update
 
-
 # configuring the flask app and database
 posts_app = Flask(__name__)
 CORS(posts_app)
@@ -34,17 +33,12 @@ class Post(posts_db.Model):
     dataUtworzenia = posts_db.Column(posts_db.DateTime, nullable=False, default=datetime.now())
     tresc = posts_db.Column(posts_db.Text, nullable=False)
     status = posts_db.Column(posts_db.String(10), default=StatusPostu.NOWY.value)
-    client_id = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("klient.id"), nullable=True) # user.id z małej bo odwołujemy się do tablicy
-    # client_id = posts_db.Column(posts_db.Integer,nullable=True) # user.id z małej bo odwołujemy się do tablicy
-    admin_id = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("admin.id"), nullable=True)
-    
+    client_id = posts_db.Column(posts_db.Integer, nullable=True)
+    admin_id = posts_db.Column(posts_db.Integer,  nullable=True)
+
     @hybrid_property
     def author_id(self):
         return self.client_id or self.admin_id
-
-    # def __init__(self, tytul, tresc):
-    #     self.tytul = tytul
-    #     self.tresc = tresc
 
     def __init__(self, tytul, tresc, client_id):
         self.tytul = tytul
@@ -59,8 +53,8 @@ class EdycjePostu(posts_db.Model):
     id = posts_db.Column(posts_db.Integer, primary_key=True)
     zawartosc = posts_db.Column(posts_db.Text, nullable=False)
     dataEdycji = posts_db.Column(posts_db.DateTime, nullable=False, default=datetime.now(timezone.utc))
-    post = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("post.id"), nullable=False)
-    edytujacy = posts_db.Column(posts_db.Integer, posts_db.ForeignKey("admin.id"), nullable=False)
+    post = posts_db.Column(posts_db.Integer, nullable=False)
+    edytujacy = posts_db.Column(posts_db.Integer,  nullable=False)
 
     def __init__(self, zawartosc, post_id, edytujacy):
         self.zawartosc = zawartosc
@@ -68,46 +62,11 @@ class EdycjePostu(posts_db.Model):
         self.edytujacy = edytujacy
 
 
-    def __init__(self, zawartosc):
-        self.zawartosc = zawartosc
-    
-
-class Klient(posts_db.Model):
-    id = posts_db.Column(posts_db.Integer, primary_key=True)
-    imie = posts_db.Column(posts_db.String(20), nullable=False)
-    nazwisko = posts_db.Column(posts_db.String(20), nullable=False)
-    posts = posts_db.relationship('Post', lazy=True)    #relacja
-
-
-    def __init__(self, id, imie, nazwisko):
-        self.id = id
-        self.imie = imie
-        self.nazwisko = nazwisko
-
-    def __repr__(self):
-        return f"Użytkownik {self.imie}, {self.login}"
-        
-
-# class Admin(posts_db.Model): #
-
-    id = posts_db.Column(posts_db.Integer, primary_key=True)
-    imie = posts_db.Column(posts_db.String(20), nullable=False)
-    nazwisko = posts_db.Column(posts_db.String(20), nullable=False)
-    posts = posts_db.relationship('Post', lazy=True)    #relacja
-
-#     def __init__(self, imie, nazwisko):
-#         self.imie = imie
-#         self.nazwisko = nazwisko
-
-#     def __repr__(self):
-#         return f"Użytkownik {self.imie}, {self.login}"
-
-
-
 # this is for jsonification of our post objects
 class postSchema(posts_ma.Schema):
     class Meta:
         fields = ('id', 'tytul', 'status', 'dataUtworzenia', 'tresc', 'client_id', 'admin_id')
+
 
 post_schema = postSchema()
 posts_schema = postSchema(many=True)
@@ -124,10 +83,12 @@ def getPosts():
 
     return jsonify(results)
 
+
 @posts_app.route('/get/<id>', methods=['GET'])
 def getPostDetails(id):
     post = Post.query.get(id)
     return post_schema.jsonify(post)
+
 
 @posts_app.route('/add', methods=['POST'])
 def addPost():
@@ -142,6 +103,7 @@ def addPost():
 
     return post_schema.jsonify(post)
 
+
 @posts_app.route('/update/<id>', methods=['PUT'])
 def editPost(id):
     post = Post.query.get(id)
@@ -151,7 +113,8 @@ def editPost(id):
     zawartosc = updatedTytul + ', ' + updatedTresc
     autor = request.json['autor']
 
-    edycja = EdycjePostu(zawartosc=zawartosc, post_id=id, edytujacy=autor)  # tu potem zamiast 0 bedzie id zalogowanego uzytkownika
+    edycja = EdycjePostu(zawartosc=zawartosc, post_id=id,
+                         edytujacy=autor)  # tu potem zamiast 0 bedzie id zalogowanego uzytkownika
     post.tresc = updatedTresc
     post.tytul = updatedTytul
     post.dataUtworzenia = datetime.now()
@@ -163,10 +126,11 @@ def editPost(id):
 
     return post_schema.jsonify(post)
 
+
 @posts_app.route('/delete/<id>', methods=['DELETE'])
 def deletePost(id):
     post = Post.query.get(id)
- 
+
     post.status = StatusPostu.USUNIETY.value
 
     posts_db.session.commit()
@@ -176,5 +140,6 @@ def deletePost(id):
 
 if __name__ == '__main__':
     # with posts_app.app_context():
-        # posts_db.create_all()
+    # posts_db.create_all()
     posts_app.run(debug=True, port=5001)
+
