@@ -201,6 +201,10 @@ def add_rachunek():
 
     return rachunek_schema.jsonify(rachunek)
 
+@currencies_app.after_request
+def after_each(response):
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
 
 if __name__ == '__main__':
     # with currencies_app.app_context():

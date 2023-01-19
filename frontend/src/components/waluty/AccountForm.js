@@ -43,6 +43,7 @@ function AccountForm(props) {
                     return acc
                 })
                 accs = accs.filter((acc) => {return acc.walutaId === "USD"});
+                console.log(accs);
                 setAccounts(accs)
             } catch (err) {
                 console.log("Not authenticated")
